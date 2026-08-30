@@ -1,0 +1,14 @@
+BVS Protocol publish review
+
+PASS — doctype
+PASS — lang_en
+PASS — viewport
+PASS — title
+PASS — single_main
+PASS — single_html_close
+PASS — no_placeholder_links
+PASS — manifest_exists
+PASS — service_worker_exists
+
+English copy review: corrected for UK English usage, clarity and consistency.
+Commercial/payment links: deliberately left unconnected until affiliate/subscription partner approval.
