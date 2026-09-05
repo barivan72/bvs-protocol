@@ -1,4 +1,4 @@
-const CACHE="bvs-protocol-v2";
+const CACHE="bvs-protocol-v3";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./i18n.js"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
 self.addEventListener("activate",e=>e.waitUntil(Promise.all([
@@ -7,7 +7,7 @@ self.addEventListener("activate",e=>e.waitUntil(Promise.all([
 ])));
 self.addEventListener("fetch",e=>{
   if(e.request.method!=="GET") return;
-  e.respondWith(fetch(e.request).then(r=>{
+  e.respondWith(fetch(e.request,{cache:"no-store"}).then(r=>{
     const copy=r.clone(); caches.open(CACHE).then(c=>c.put(e.request,copy)); return r;
   }).catch(()=>caches.match(e.request).then(r=>r||caches.match("./index.html"))));
 });
