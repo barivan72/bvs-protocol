@@ -411,5 +411,90 @@ function renderAll(){
 renderAll();
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
+<script>
+(() => {
+  const PRODUCTS = {
+    vitd: {name:"Vitamin D3 + K2", url:"https://amzn.to/4d4VImj"},
+    vitb: {name:"Vitamin B Complex", url:"https://amzn.to/4rccZQB"},
+    vitc: {name:"Liposomal Vitamin C", url:"https://amzn.to/3VbV00n"},
+    mag: {name:"Magnesium Glycinate", url:"https://amzn.to/4hbsDbd"},
+    coq10: {name:"CoQ10", url:"https://amzn.to/4qYb6qu"},
+    omega3: {name:"Omega-3 Fish Oil", url:"https://amzn.to/4qS3d5P"},
+    creatine: {name:"Creatine Monohydrate", url:"https://amzn.to/4h8STTD"}
+  };
+  const STAGE_PRODUCTS = {
+    B:["vitd","vitb","vitc","mag"],
+    V:["vitd","vitb","vitc","mag","coq10","omega3"],
+    S:["vitd","vitb","vitc","mag","coq10","omega3","creatine"]
+  };
+  function productButtons(ids){
+    return ids.map(id => {
+      const p = PRODUCTS[id];
+      return `<a class="btn primary" href="${p.url}" target="_blank" rel="sponsored noopener">${p.name}</a>`;
+    }).join("");
+  }
+  function openShop(){
+    switchView("shop");
+    document.getElementById("main").scrollIntoView({behavior:"smooth"});
+  }
+  const heroActions = document.querySelector(".hero-actions");
+  if (heroActions && !document.getElementById("heroShopBtn")) {
+    const b = document.createElement("button");
+    b.className = "btn blue";
+    b.id = "heroShopBtn";
+    b.textContent = "Shop Recommended Supplements";
+    b.addEventListener("click", openShop);
+    heroActions.appendChild(b);
+  }
+  const desktopNav = document.querySelector(".nav");
+  if (desktopNav && !desktopNav.querySelector('[data-view="shop"]')) {
+    const b = document.createElement("button");
+    b.dataset.view = "shop";
+    b.textContent = "Shop";
+    const profile = desktopNav.querySelector('[data-view="profile"]');
+    desktopNav.insertBefore(b, profile || null);
+    b.addEventListener("click", () => switchView("shop"));
+  }
+  const mobileNav = document.querySelector(".bottom-nav");
+  if (mobileNav && !mobileNav.querySelector('[data-view="shop"]')) {
+    const b = document.createElement("button");
+    b.dataset.view = "shop";
+    b.textContent = "Shop";
+    const profile = mobileNav.querySelector('[data-view="profile"]');
+    mobileNav.insertBefore(b, profile || null);
+    b.addEventListener("click", () => switchView("shop"));
+    mobileNav.style.gridTemplateColumns = "repeat(5,1fr)";
+  }
+  const wrap = document.querySelector("main .wrap");
+  const profileSection = document.getElementById("profile");
+  if (wrap && !document.getElementById("shop")) {
+    const shop = document.createElement("section");
+    shop.className = "view";
+    shop.id = "shop";
+    shop.innerHTML = `
+      <div class="page-head"><div><div class="kicker">BVS Shop</div><h2>Shop the BVS Protocol.</h2><p>Products selected to match each stage of the BVS routine. Choose your stage or shop individual supplements.</p></div></div>
+      <div class="grid g3">
+        <article class="card"><div class="kicker">Stage B</div><h3>Bioavailability</h3><p class="muted small">Foundation products for the B stage.</p><div class="grid" style="margin-top:14px">${productButtons(STAGE_PRODUCTS.B)}</div></article>
+        <article class="card"><div class="kicker">Stage V</div><h3>Vitality</h3><p class="muted small">Everything in B, plus CoQ10 and Omega-3.</p><div class="grid" style="margin-top:14px">${productButtons(STAGE_PRODUCTS.V)}</div></article>
+        <article class="card"><div class="kicker">Stage S</div><h3>Synergy</h3><p class="muted small">The complete routine, including creatine.</p><div class="grid" style="margin-top:14px">${productButtons(STAGE_PRODUCTS.S)}</div></article>
+      </div>
+      <article class="card" style="margin-top:16px"><div class="kicker">All products</div><h3>Recommended supplements</h3><div class="grid g2" style="margin-top:14px">${productButtons(Object.keys(PRODUCTS))}</div><p class="muted small" style="margin-top:14px">As an Amazon Associate, BVS Protocol may earn from qualifying purchases.</p></article>`;
+    wrap.insertBefore(shop, profileSection || null);
+  }
+  const originalRenderProtocol = renderProtocol;
+  renderProtocol = function(){
+    originalRenderProtocol();
+    const detail = document.getElementById("protocolDetail");
+    if (!detail) return;
+    const stage = state.profile.stage;
+    const cta = document.createElement("div");
+    cta.style.marginTop = "16px";
+    cta.innerHTML = `<button class="btn blue" id="shopStageBtn">Shop Stage ${stage}</button>`;
+    detail.appendChild(cta);
+    cta.querySelector("#shopStageBtn").addEventListener("click", openShop);
+  };
+  renderProtocol();
+})();
+</script>
 </body>
 </html>
