@@ -1,0 +1,1 @@
+BVS Protocol final QA target: round raster app icon; hero 3D atom with upright B/V/S letters orbiting; small satellites orbiting; 3D sphere selectors throughout; reminders/calendar retained; multilingual text preserved; Opera install guide points users to Edge/Chrome; responsive mobile layout retained.
