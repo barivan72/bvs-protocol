@@ -11,16 +11,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="BVS Protocol — Bioavailability, Vitality and Synergy. Supplement routine, hydration tracker and monthly adherence history.">
 <title>BVS Protocol — Bioavailability • Vitality • Synergy</title>
-<link rel="manifest" href="./manifest.webmanifest?v=13">
-<link rel="icon" href="./bvs-logo-v3.svg?v=5" type="image/svg+xml">
-<link rel="shortcut icon" href="./bvs-logo-v3.svg?v=5" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./bvs-logo-v3.svg?v=5">
-<link rel="stylesheet" href="./bvs-v3.css?v=4">
-<link rel="stylesheet" href="./bvs-v3-polish.css?v=2">
+<link rel="manifest" href="./manifest.webmanifest?v=14">
+<link rel="icon" href="./bvs-app-icon-192.png?v=14" type="image/png" sizes="192x192">
+<link rel="shortcut icon" href="./bvs-app-icon-192.png?v=14" type="image/png">
+<link rel="apple-touch-icon" href="./bvs-app-icon-192.png?v=14">
+<link rel="stylesheet" href="./bvs-v3.css?v=5">
+<link rel="stylesheet" href="./bvs-v3-polish.css?v=3">
 <style>html,body{background:#02070d!important;color:#f5fbff}body{visibility:visible;margin:0}</style>
 </head>
 <body>
-<header class="topbar"><div class="wrap topbar-in"><div class="brand"><img src="./bvs-logo-v3.svg?v=5" alt="BVS Protocol"><span><b>BVS</b> PROTOCOL</span></div><nav class="nav" aria-label="Main navigation"><button class="active" data-view="today">My Day</button><button data-view="calendar">Calendar</button><button data-view="protocol">B / V / S</button><button data-view="shop">Shop</button><button data-view="profile">Profile</button></nav></div></header>
+<header class="topbar"><div class="wrap topbar-in"><div class="brand"><img src="./bvs-logo-v3.svg?v=6" alt="BVS Protocol"><span><b>BVS</b> PROTOCOL</span></div><nav class="nav" aria-label="Main navigation"><button class="active" data-view="today">My Day</button><button data-view="calendar">Calendar</button><button data-view="protocol">B / V / S</button><button data-view="shop">Shop</button><button data-view="profile">Profile</button></nav></div></header>
 <section class="hero"><div class="hero-inner"><div class="eyebrow">Bioavailability • Vitality • Synergy</div><h1><span>BVS</span> PROTOCOL</h1><p>A clear daily system for supplement timing, hydration and consistency — built around three progressive stages.</p><div class="atom-stage" aria-label="Animated BVS atom"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="atom-core">BVS</div><div class="hero-orb">B</div><div class="hero-orb">V</div><div class="hero-orb">S</div><i class="electron"></i><i class="electron"></i><i class="electron"></i><i class="electron"></i></div><div class="hero-actions"><button class="btn primary" id="enterBvs">Enter BVS</button><button class="btn blue" data-go="shop">Shop Recommended Supplements</button></div></div></section>
 <main id="main"><div class="wrap">
 <section class="view active" id="today"><div class="page-head"><div><div class="kicker">Today</div><h2>My BVS Day</h2><p>Choose your stage, record each supplement and keep your hydration target visible.</p></div></div><div class="bvs-selector"><button class="bvs-button active" data-stage="B" aria-label="Bioavailability stage"><div><div class="stage-orb">B</div><strong>Bioavailability</strong><small>Foundation</small></div></button><button class="bvs-button" data-stage="V" aria-label="Vitality stage"><div><div class="stage-orb">V</div><strong>Vitality</strong><small>Builds on B</small></div></button><button class="bvs-button" data-stage="S" aria-label="Synergy stage"><div><div class="stage-orb">S</div><strong>Synergy</strong><small>Complete routine</small></div></button></div><div class="metrics"><div class="metric"><small>Stage</small><strong id="metricStage">B</strong></div><div class="metric"><small>Taken</small><strong id="metricTaken">0 / 0</strong></div><div class="metric"><small>Adherence</small><strong id="metricPct">0%</strong></div><div class="metric"><small>Water</small><strong id="metricWater">0 mL</strong></div></div><div class="grid g2"><article class="card"><div class="kicker">Supplements due</div><h3>Today’s routine</h3><div class="timeline" id="todayList"></div></article><article class="card"><div class="kicker">Hydration</div><h3 id="waterHeading">Water target</h3><div class="progress-row"><span id="waterText">0 mL</span><strong id="waterPct">0%</strong></div><div class="progress"><i id="waterBar"></i></div><div class="water-quick"><button class="water-btn" data-water="250"><b>+250</b><small>mL</small></button><button class="water-btn" data-water="500"><b>+500</b><small>mL</small></button><button class="water-btn" data-water="750"><b>+750</b><small>mL</small></button><button class="water-btn" data-water="1000"><b>+1.0</b><small>L</small></button></div></article></div></section>
@@ -31,6 +31,6 @@
 </div></main>
 <footer class="footer"><div class="wrap"><strong>BVS PROTOCOL</strong> — Bioavailability • Vitality • Synergy<br>Educational wellness-planning tool. It does not diagnose, treat or replace medical advice.</div></footer>
 <nav class="bottom-nav" aria-label="Mobile navigation"><button class="active" data-view="today">My Day</button><button data-view="calendar">Calendar</button><button data-view="protocol">B / V / S</button><button data-view="shop">Shop</button><button data-view="profile">Profile</button></nav><div class="toast" id="toast" aria-live="polite"></div>
-<script src="./bvs-v3.js?v=4" defer></script>
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=13',{updateViaCache:'none'}).catch(()=>{}))}</script>
+<script src="./bvs-v3.js?v=5" defer></script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=14',{updateViaCache:'none'}).catch(()=>{}))}</script>
 </body></html>
