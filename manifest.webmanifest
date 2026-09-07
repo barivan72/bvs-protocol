@@ -1,15 +1,15 @@
 {
-  "id": "/?bvs=v3",
+  "id": "./?bvs=v3",
   "name": "BVS Protocol",
   "short_name": "BVS",
-  "start_url": "/?bvs=v3",
-  "scope": "/",
+  "start_url": "./?bvs=v3",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#02070d",
   "theme_color": "#02070d",
   "description": "Bioavailability, Vitality and Synergy supplement routine tracker.",
   "icons": [
-    {"src":"/bvs-logo-v3.svg?v=4","sizes":"any","type":"image/svg+xml","purpose":"any"},
-    {"src":"/bvs-logo-v3.svg?v=4","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
+    {"src":"./bvs-logo-v3.svg?v=5","sizes":"any","type":"image/svg+xml","purpose":"any"},
+    {"src":"./bvs-logo-v3.svg?v=5","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
   ]
 }
