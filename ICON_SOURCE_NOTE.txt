@@ -1,0 +1,1 @@
+Final app icon source is the round blue/silver/white BVS atom logo approved in the project conversation. Production manifest should reference PNG files bvs-app-icon-192.png and bvs-app-icon-512.png, not the legacy SVG.
