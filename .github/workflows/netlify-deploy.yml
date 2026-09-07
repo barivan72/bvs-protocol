@@ -23,5 +23,10 @@ jobs:
       - name: Deploy production to Netlify
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: npx --yes netlify-cli@latest deploy --prod --dir=. --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+          NETLIFY_SITE_ID: 8ee8360e-5383-4099-8c17-b9d9afeef834
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "NETLIFY_AUTH_TOKEN is missing. Add it in GitHub repository Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          npx --yes netlify-cli@latest deploy --prod --dir=. --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
