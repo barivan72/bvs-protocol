@@ -1,6 +1,18 @@
 [build]
   publish = "."
 
+[[redirects]]
+  from = "/"
+  to = "/index-v3.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/index.html"
+  to = "/index-v3.html"
+  status = 200
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -9,6 +21,26 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 [[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
+
+[[headers]]
+  for = "/index-v3.html"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
+
+[[headers]]
   for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/manifest.webmanifest"
   [headers.values]
     Cache-Control = "no-cache"
