@@ -1,0 +1,1 @@
+BVS final pass: consolidate visuals, app icon, install flow and reminders before next production deploy.
