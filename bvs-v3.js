@@ -41,6 +41,22 @@ function productButtons(ids){return ids.map(id=>`<a class="btn primary" href="${
 function renderShop(){['B','V','S'].forEach(s=>{const el=$(`#shop${s}`);if(el)el.innerHTML=productButtons(STAGES[s].supplements.map(x=>x.id))});$('#shopAll').innerHTML=productButtons(Object.keys(PRODUCTS))}
 $('#saveProfile').onclick=()=>{state.profile.name=$('#profileName').value.trim()||'Resident';state.profile.stage=$('#profileStage').value;save();renderAll();toast('Profile saved')};$('#resetDemo').onclick=()=>{if(confirm('Reset all BVS records stored in this browser?')){localStorage.removeItem(KEY);state=defaultState();renderAll();toast('Records reset')}};
 function renderAll(){$('#profileName').value=state.profile.name||'Resident';$('#profileStage').value=state.profile.stage;$$('[data-stage]').forEach(b=>b.classList.toggle('active',b.dataset.stage===state.profile.stage));renderToday();renderProtocol();renderCalendar();renderShop()}
-function animateAtom(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const stage=$('.atom-stage'),orbs=$$('.hero-orb'),electrons=$$('.electron');let t0=performance.now();function frame(now){const t=(now-t0)/1000,cx=stage.clientWidth/2,cy=stage.clientHeight/2,rx=Math.min(stage.clientWidth*.33,255),ry=Math.min(stage.clientHeight*.24,92);orbs.forEach((o,i)=>{const a=t*.48+i*(Math.PI*2/3),x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry,z=(Math.sin(a)+1)/2,scale=.80+z*.28;o.style.transform=`translate3d(${x-o.offsetWidth/2}px,${y-o.offsetHeight/2}px,0) scale(${scale})`;o.style.zIndex=String(8+Math.round(z*5));o.style.filter=`brightness(${.86+z*.22})`});electrons.forEach((e,i)=>{const a=-t*(.72+i*.04)+i*1.55,x=cx+Math.cos(a)*(rx*.94),y=cy+Math.sin(a)*(ry*1.34);e.style.transform=`translate3d(${x-e.offsetWidth/2}px,${y-e.offsetHeight/2}px,0)`});requestAnimationFrame(frame)}requestAnimationFrame(frame)}
+function animateAtom(){
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const stage=$('.atom-stage'),orbs=$$('.hero-orb'),electrons=$$('.electron'),rings=$$('.ring');
+ if(!stage||!orbs.length)return;
+ let t0=performance.now(),pointerX=0,pointerY=0,targetX=0,targetY=0;
+ stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect();targetX=((e.clientX-r.left)/r.width-.5)*1.0;targetY=((e.clientY-r.top)/r.height-.5)*1.0});
+ stage.addEventListener('pointerleave',()=>{targetX=0;targetY=0});
+ function frame(now){
+  const t=(now-t0)/1000;
+  pointerX+=(targetX-pointerX)*.045;pointerY+=(targetY-pointerY)*.045;
+  const cx=stage.clientWidth/2,cy=stage.clientHeight/2,rx=Math.min(stage.clientWidth*.34,265),ry=Math.min(stage.clientHeight*.245,98);
+  rings.forEach((r,i)=>{const base=[0,60,-60][i]||0,drift=Math.sin(t*.24+i)*1.8;const tilt=67+pointerY*5;r.style.transform=`translate(-50%,-50%) rotateZ(${base+drift+pointerX*5}deg) rotateX(${tilt}deg)`});
+  orbs.forEach((o,i)=>{const a=t*.52+i*(Math.PI*2/3),depth=Math.sin(a),z=(depth+1)/2,x=cx+Math.cos(a)*rx+pointerX*16,y=cy+depth*ry+pointerY*10,scale=.76+z*.34;o.style.transform=`translate3d(${x-o.offsetWidth/2}px,${y-o.offsetHeight/2}px,${(z-.5)*72}px) scale(${scale})`;o.style.zIndex=String(8+Math.round(z*7));o.style.filter=`brightness(${.83+z*.27}) saturate(${.96+z*.12})`;o.style.opacity=String(.84+z*.16)});
+  electrons.forEach((e,i)=>{const speed=.76+i*.055,a=-t*speed+i*(Math.PI*2/electrons.length),phase=i%2?1:-1,x=cx+Math.cos(a)*(rx*(.88+i*.035))+pointerX*10,y=cy+Math.sin(a)*(ry*(1.20+i*.06))*phase+pointerY*8,z=(Math.sin(a+i)+1)/2,scale=.72+z*.34;e.style.transform=`translate3d(${x-e.offsetWidth/2}px,${y-e.offsetHeight/2}px,${(z-.5)*55}px) scale(${scale})`;e.style.zIndex=String(7+Math.round(z*8));e.style.opacity=String(.58+z*.42)});
+  requestAnimationFrame(frame)
+ }
+ requestAnimationFrame(frame)
+}
 renderAll();animateAtom();
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js?v=11',{updateViaCache:'none'}).catch(()=>{});
