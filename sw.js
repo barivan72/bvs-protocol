@@ -1,7 +1,36 @@
-const CACHE='bvs-protocol-v8';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./i18n.js','./bvs-premium.css','./bvs-3d-v2.css','./bvs-ui-v2.js','./bvs-reminders-v2.js','./bvs-app-icon-192.png','./bvs-app-icon-512.png'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))),self.clients.claim()])));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))))});
-self.addEventListener('notificationclick',e=>{e.notification.close();const target=(e.notification.data&&e.notification.data.url)||'./';e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const c of list){if('focus' in c){c.navigate(target);return c.focus()}}return clients.openWindow?clients.openWindow(target):undefined}))});
-self.addEventListener('push',e=>{let data={};try{data=e.data?e.data.json():{}}catch(_){data={body:e.data?e.data.text():'BVS reminder'}}const title=data.title||'BVS Protocol';e.waitUntil(self.registration.showNotification(title,{body:data.body||'Time for your BVS routine.',icon:'bvs-app-icon-512.png',badge:'bvs-app-icon-192.png',tag:data.tag||'bvs-push',vibrate:[220,100,220],data:{url:data.url||'./#today'}}))});
+const CACHE='bvs-protocol-v11';
+const STATIC=['/index-v3.html','/bvs-v3.css?v=3','/bvs-v3.js?v=3','/bvs-logo-v3.svg?v=3','/manifest.webmanifest?v=11'];
+self.addEventListener('install',event=>{
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(STATIC)).then(()=>self.skipWaiting()));
+});
+self.addEventListener('activate',event=>{
+  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(key=>key===CACHE?Promise.resolve():caches.delete(key)))).then(()=>self.clients.claim()));
+});
+self.addEventListener('fetch',event=>{
+  if(event.request.method!=='GET') return;
+  if(event.request.mode==='navigate'){
+    event.respondWith(fetch(event.request,{cache:'no-store'}).catch(()=>caches.match('/index-v3.html')));
+    return;
+  }
+  event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
+    if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
+    return response;
+  }).catch(()=>caches.match(event.request)));
+});
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const target=(event.notification.data&&event.notification.data.url)||'/';
+  event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+    for(const client of list){if('focus' in client){client.navigate(target);return client.focus();}}
+    return clients.openWindow?clients.openWindow(target):undefined;
+  }));
+});
+self.addEventListener('push',event=>{
+  let data={};
+  try{data=event.data?event.data.json():{}}catch(_){data={body:event.data?event.data.text():'BVS reminder'}}
+  event.waitUntil(self.registration.showNotification(data.title||'BVS Protocol',{
+    body:data.body||'Time for your BVS routine.',
+    icon:'/bvs-logo-v3.svg?v=3',badge:'/bvs-logo-v3.svg?v=3',tag:data.tag||'bvs-push',
+    vibrate:[220,100,220],data:{url:data.url||'/#today'}
+  }));
+});
