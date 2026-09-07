@@ -1,0 +1,1 @@
+Final review marker for BVS Protocol premium 3D/app-icon pass. No production deploy triggered by this file alone; source commit can be reviewed before Netlify publishes.
