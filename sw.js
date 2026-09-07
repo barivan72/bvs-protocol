@@ -1,4 +1,4 @@
-const CACHE="bvs-protocol-v5";
+const CACHE="bvs-protocol-v6";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./i18n.js","./bvs-app-icon.svg","./bvs-premium.css","./bvs-ui.js","./bvs-reminders.js"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
 self.addEventListener("activate",e=>e.waitUntil(Promise.all([
