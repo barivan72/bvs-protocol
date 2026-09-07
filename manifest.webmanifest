@@ -2,8 +2,17 @@
   "name": "BVS Protocol",
   "short_name": "BVS",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#02070d",
   "theme_color": "#06131f",
-  "description": "Bioavailability, Vitality and Synergy supplement routine tracker."
+  "description": "Bioavailability, Vitality and Synergy supplement routine tracker.",
+  "icons": [
+    {
+      "src": "bvs-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
