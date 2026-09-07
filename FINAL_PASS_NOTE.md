@@ -1,1 +1,0 @@
-Final scope: round PNG app icon, corrected PWA manifest, v2 3D sphere UI, upright B/V/S motion, reminder/calendar UX, multilingual preservation, and one reviewed production deploy.

@@ -1,1 +1,0 @@
-Placeholder only. Final PWA icon binary upload is handled separately in the final source commit.
