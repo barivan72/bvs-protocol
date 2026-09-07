@@ -1,0 +1,1 @@
+Final PWA icon assets should be real PNG raster files at 192x192 and 512x512. The current source prepares the app to reference those final PNG assets after binary upload.
