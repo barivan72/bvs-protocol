@@ -1,0 +1,66 @@
+const SUPPLEMENTS={
+  D3K2:{stage:"B",name:"Vitamin D3 + K2",time:"08:00",days:[0,1,2,3,4,5,6],
+    take:"Take with a meal or snack that contains some fat. Water is fine as the drink.",
+    examples:["egg or omelette","full-fat yoghurt","avocado","nuts or nut butter","olive oil with food"],
+    combo:"If omega-3 or CoQ10 are also in the approved plan, they can usually share the same meal. The benefit here is mainly a simple, memorable fat-containing meal routine.",
+    avoid:"Warfarin / vitamin-K antagonists need a consistent, clinician-approved vitamin K intake. Orlistat can reduce vitamin D absorption. High-dose vitamin D also deserves review with thiazide diuretics and some statins.",
+    why:"Vitamin D is fat-soluble and is absorbed better with a meal or snack containing fat. Vitamin K has an important interaction with warfarin.",
+    short:"WITH FOOD + SOME FAT"},
+  BCOMPLEX:{stage:"B",name:"Vitamin B complex",time:"08:15",days:[0,1,2,3,4,5,6],
+    take:"Take with water. It can generally be taken with or without food; use breakfast or another meal if it causes stomach upset.",
+    examples:["water","breakfast","yoghurt","toast or cereal"],
+    combo:"There is no special requirement to add dietary fat. A consistent morning routine is often the simplest adherence strategy.",
+    avoid:"Metformin and long-term acid-suppressing medicines such as omeprazole can reduce vitamin B12 status. That is a monitoring issue, not something a food combo reliably fixes.",
+    why:"B vitamins are water-soluble. For B12, medicine history and deficiency risk can matter more than a special food pairing.",
+    short:"WATER • FOOD OPTIONAL"},
+  VITC:{stage:"B",name:"Vitamin C",time:"13:00",days:[0,1,2,3,4,5,6],
+    take:"Take with water, with or without food. A meal can help if it causes stomach upset.",
+    examples:["water","fruit","vegetable-rich meal","meal containing beans or lentils"],
+    combo:"Useful combo: vitamin C increases absorption of non-haem iron from plant foods. If iron is prescribed separately, follow the iron plan.",
+    avoid:"High-dose vitamin C needs caution in iron-overload disorders such as haemochromatosis and should be reviewed during chemotherapy or radiotherapy.",
+    why:"Vitamin C is water-soluble and can enhance absorption of non-haem iron.",
+    short:"WATER • GOOD WITH PLANT IRON"},
+  MAG:{stage:"B",name:"Magnesium glycinate",time:"20:00",days:[0,1,2,3,4,5,6],
+    take:"Take with water. Taking it with a meal can reduce stomach upset for some people.",
+    examples:["water","evening meal","light snack if needed"],
+    combo:"Calcium is NOT a universal 'never together' combination. At usual intakes, human studies do not show a clinically important calcium–magnesium absorption problem. If using large separate mineral doses, follow the pharmacist or product plan.",
+    avoid:"Important: tetracycline/quinolone antibiotics can bind magnesium. NIH guidance uses at least 2 hours before or 4–6 hours after these antibiotics. Oral bisphosphonates such as alendronate should be separated from magnesium by at least 2 hours. Very high zinc doses can also interfere with magnesium status.",
+    why:"The important bioavailability issue is mineral binding with certain medicines, not a blanket ban on calcium.",
+    short:"FOOD IF NEEDED • CHECK MEDICINES"},
+  OMEGA3:{stage:"V",name:"Omega-3 (EPA/DHA)",time:"13:00",days:[0,1,2,3,4,5,6],
+    take:"Take with a meal. Food often improves tolerability and can improve absorption for some omega-3 formulations.",
+    examples:["lunch or dinner","meal with olive oil","egg or avocado meal","regular main meal"],
+    combo:"Can usually share a meal with vitamin D/K or CoQ10 if all are in the approved plan. This creates one easy 'meal group' instead of many separate reminders.",
+    avoid:"Review higher-dose omega-3 with warfarin or other anticoagulants/antiplatelet medicines. Blood-pressure medicines may also warrant review.",
+    why:"Meal context and formulation affect omega-3 uptake; taking it with food can also reduce fishy aftertaste or stomach upset.",
+    short:"WITH A MEAL"},
+  COQ10:{stage:"V",name:"CoQ10",time:"13:00",days:[0,1,2,3,4,5,6],
+    take:"Take with a meal; a meal containing some fat is a simple routine for standard CoQ10 formulations.",
+    examples:["lunch","dinner","yoghurt","avocado or olive-oil meal"],
+    combo:"Can often sit in the same approved meal group as vitamin D/K and omega-3, which reduces the number of daily decisions.",
+    avoid:"CoQ10 can interact with warfarin and insulin and may not be compatible with some cancer treatments. Use the clinician-approved plan.",
+    why:"CoQ10 is poorly water-soluble, and food/formulation can influence oral absorption.",
+    short:"WITH A MEAL"},
+  CREATINE:{stage:"S",name:"Creatine monohydrate",time:"10:00",days:[0,1,2,3,4,5,6],
+    take:"Mix with water or another permitted drink and take consistently at the agreed dose.",
+    examples:["water","smoothie if permitted","with a regular meal"],
+    combo:"The most useful 'combo' is consistency: attach it to a daily habit such as breakfast or a hydration event.",
+    avoid:"People with kidney disease or another relevant medical condition should use creatine only with appropriate clinical advice. A strong caffeine-avoidance rule is not supported well enough for BVS to enforce.",
+    why:"For routine use, consistent daily intake is generally more useful than chasing a special absorption window.",
+    short:"CONSISTENCY + WATER"}
+};
+const STAGES={B:{name:'Bioavailability',water:1500,description:'The foundation. Vitamin D, B complex, vitamin C and magnesium, organised around food, water and your daily routine.'},V:{name:'Vitality',water:2000,description:'Everything in Bioavailability, with CoQ10 and omega-3 added to the routine.'},S:{name:'Synergy',water:3000,description:'The complete B + V routine, with creatine monohydrate and a personalised hydration target.'}};
+const PRODUCTS=[
+ {key:'D3K2',icon:'D₃',name:'Vitamin D3 + K2',stage:'B',link:'https://amzn.to/4d4VImj',role:'Bone & muscle function'},
+ {key:'BCOMPLEX',icon:'B',name:'Vitamin B complex',stage:'B',link:'https://amzn.to/4rccZQB',role:'Energy metabolism'},
+ {key:'VITC',icon:'C',name:'Liposomal vitamin C',stage:'B',link:'https://amzn.to/3VbV00n',role:'Collagen & immune function'},
+ {key:'MAG',icon:'Mg',name:'Magnesium glycinate',stage:'B',link:'https://amzn.to/4hbsDbd',role:'Muscle & nerve function'},
+ {key:'COQ10',icon:'Q₁₀',name:'CoQ10',stage:'V',link:'https://amzn.to/4qYb6qu',role:'Cellular energy processes'},
+ {key:'OMEGA3',icon:'Ω₃',name:'Omega-3 / fish oil',stage:'V',link:'https://amzn.to/4qS3d5P',role:'EPA & DHA fatty acids'},
+ {key:'CREATINE',icon:'Cr',name:'Creatine monohydrate',stage:'S',link:'https://amzn.to/4h8STTD',role:'Short bursts of muscle energy'}
+];
+const PURPOSES={D3K2:'Vitamin D supports calcium absorption, bones and muscle function; vitamin K contributes to normal blood clotting. Dietary fat can improve vitamin D absorption.',BCOMPLEX:'B vitamins help the body use energy from food and support nervous-system processes. Morning and evening are routine checkpoints, not a reason to double the daily product dose.',VITC:'Vitamin C supports collagen formation and normal immune function, and improves absorption of iron from plant foods.',MAG:'Magnesium contributes to normal muscle and nerve function. The evening slot is a routine preference, not a guarantee of improved sleep.',COQ10:'CoQ10 participates in mitochondrial energy production. Taking a supplement does not guarantee more energy or prevent heart disease.',OMEGA3:'EPA and DHA are components of cell membranes and participate in inflammatory signalling. DHA is found in the brain; supplement benefits vary by dose, formulation and purpose.',CREATINE:'Creatine helps replenish ATP during short, repeated bursts of high-intensity activity. It is most useful alongside suitable resistance or sprint training.'};
+const SOURCES={D3K2:'https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/',BCOMPLEX:'https://www.nhs.uk/conditions/vitamins-and-minerals/vitamin-b/',VITC:'https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/',MAG:'https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/',COQ10:'https://www.nccih.nih.gov/health/coenzyme-q10',OMEGA3:'https://ods.od.nih.gov/factsheets/Omega3FattyAcids-Consumer/',CREATINE:'https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/'};
+SUPPLEMENTS.BCOMPLEX.time='08:15';SUPPLEMENTS.VITC.time='08:15';
+SUPPLEMENTS.BCOMPLEX_PM={...SUPPLEMENTS.BCOMPLEX,name:'Vitamin B complex — evening',time:'19:00',base:'BCOMPLEX'};
+SUPPLEMENTS.VITC_PM={...SUPPLEMENTS.VITC,name:'Vitamin C — evening',time:'19:00',base:'VITC'};
