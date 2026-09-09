@@ -1,0 +1,59 @@
+name: Pet Gadget Club public verification
+on:
+  push:
+    branches: [pet-gadget-club-live-20260909]
+    paths: ['.github/workflows/pgc-public-check.yml', 'build.cjs', 'release-assets/**']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build and verify catalogue integrity
+        run: node build.cjs
+      - name: Verify anonymous website access and all catalogue photographs
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures, datetime, html, json, pathlib, re, urllib.request, urllib.error
+          root=pathlib.Path('public')
+          text=(root/'index.html').read_text()
+          match=re.search(r'<script[^>]+id=[\"\']catalog-data[\"\'][^>]*>(.*?)</script>',text,re.S)
+          products=json.loads(match.group(1))
+          def check(url):
+              result={'url':url}
+              try:
+                  request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 PetGadgetClub-QA/1.0'})
+                  with urllib.request.urlopen(request,timeout=20) as response:
+                      sample=response.read(500000)
+                      result.update(status=response.status,final_url=response.url,content_type=response.headers.get('Content-Type',''),bytes_read=len(sample))
+                      if 'text/html' in result['content_type']:
+                          title=re.search(b'<title[^>]*>(.*?)</title>',sample,re.S|re.I)
+                          result['title']=html.unescape(title.group(1).decode(errors='replace')) if title else ''
+                          result['catalogue_present']=b'id="catalog-data"' in sample
+              except urllib.error.HTTPError as error: result.update(status=error.code,error=str(error))
+              except Exception as error: result.update(status=None,error=str(error))
+              return result
+          websites=[
+            'https://bvs-protocol-git-pet-gadget-club-live-d2c1e8-ivanaguiarbar-4642.vercel.app',
+            'https://rawcdn.githack.com/barivan72/bvs-protocol/dfdf8c6bc3283c8726e2774038908962dec1bd3e/index.html',
+            'https://pet-gadget-club.netlify.app'
+          ]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+              pages=list(pool.map(check,websites))
+              photos=list(pool.map(check,[p['image'] for p in products]))
+          for p,result in zip(products,photos):
+              result.update(id=p['id'],name=p['brand']+' '+p['name'],valid_image=result.get('status')==200 and result.get('content_type','').startswith('image/'))
+          report={'checked_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'websites':pages,'photo_count':len(photos),'working_photos':sum(p['valid_image'] for p in photos),'photos':photos}
+          (root/'online-check.json').write_text(json.dumps(report,indent=2))
+          print('WEBSITES',json.dumps(pages))
+          print('PHOTOS',report['working_photos'],'/',len(photos))
+          print('FAILED_PHOTOS',json.dumps([p for p in photos if not p['valid_image']]))
+          PY
+      - name: Preserve verification report and website
+        uses: actions/upload-artifact@v4
+        with:
+          name: pet-gadget-club-verified-site
+          path: public/
+          retention-days: 7
