@@ -1,0 +1,12 @@
+/* BVS release 2026-09-09.4: installation must stay visible on phones. */
+.app-banner{display:flex;align-items:center;gap:18px;margin-top:22px;padding:18px 22px;border:1px solid #385978;border-radius:20px;background:linear-gradient(115deg,#132840,#091420);box-shadow:0 14px 36px -24px #000}
+.app-banner>img{width:68px;height:68px;flex-shrink:0;object-fit:contain;border-radius:50%}
+.app-banner-copy{flex:1;min-width:0}.app-banner-copy strong{display:block;font-size:1.125rem;font-weight:600;color:#eef7ff}.app-banner-copy p{margin:3px 0 0;color:#a9bfd6;font-size:.875rem}.app-banner .primary{min-height:48px;white-space:nowrap}.app-banner .download-mark{font-size:1.25rem}.release-label{display:block;margin:6px 0 0;color:#8ca6c1;font-size:.75rem;letter-spacing:.03em}
+@media(max-width:680px){
+ .nav-inner{gap:8px}.topbar .brand{font-size:.75rem;gap:7px;letter-spacing:.07em}.topbar .brand img{width:36px;height:36px}.header-actions{gap:4px}.header-actions .icon-button{min-width:32px;min-height:44px;padding:2px}.header-actions .icon-button .orb{--orb-size:27px}
+ .install-btn{font-size:.8125rem!important;gap:5px;min-height:44px;white-space:nowrap}.install-btn .orb{--orb-size:25px;font-size:1rem}
+ .app-banner{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px;margin-top:16px;padding:16px;border-radius:18px}.app-banner>img{width:60px;height:60px}.app-banner-copy strong{font-size:1rem}.app-banner-copy p{font-size:.8125rem;line-height:1.5}.app-banner .primary{grid-column:1/-1;width:100%;font-size:1rem;min-height:48px}.release-label{font-size:.6875rem}
+ .hero{padding-top:28px}.hero-levels{display:flex!important;justify-content:center;gap:10px;margin:22px 0 8px;flex-wrap:nowrap}.hero-levels button{display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;text-align:center;gap:9px;font-size:.75rem;overflow-wrap:anywhere}.hero-levels .orb{--orb-size:46px}.hero-levels small{display:none}.atom-zone{height:325px}
+}
+@media(max-width:350px){.topbar .brand-light{letter-spacing:0}.topbar .brand{font-size:.7rem}.hero-levels button{font-size:.6875rem}}
+@media print{.app-banner,.release-label{display:none!important}}
