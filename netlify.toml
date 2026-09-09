@@ -1,13 +1,13 @@
-# Vercel is the only source of the approved BVS application.
-# Keep legacy Netlify URLs and clients with old DNS working without a second UI.
-# This proxy preserves the visitor's origin and existing local records.
+# BVS Protocol is hosted on Vercel via vercel.json.
+# Netlify is retired. Skip automated Netlify builds if the old Git link remains.
 [build]
   publish = "orbit"
+  ignore = "exit 0"
 
 [[redirects]]
-  from = "/*"
-  to = "https://bvs-protocol.vercel.app/:splat"
-  status = 200
+  from = "/index-v3.html"
+  to = "/"
+  status = 301
   force = true
 
 [[headers]]
@@ -15,10 +15,14 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/"
+  [headers.values]
     Cache-Control = "no-store, max-age=0"
 
 [[headers]]
   for = "/sw.js"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
-    Service-Worker-Allowed = "/"
