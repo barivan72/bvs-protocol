@@ -1,0 +1,97 @@
+name: Verify BVS old-to-new update
+on:
+  push:
+    branches: [main]
+    paths: ['orbit/**', 'vercel.json', '.github/workflows/recovery-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: bvs-recovery-verification
+  cancel-in-progress: true
+jobs:
+  recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser tool and prepare a legacy-to-current test server
+        run: |
+          npm install -g agent-browser
+          echo "AGENT_BROWSER_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          mkdir -p verification
+          cat > /tmp/bvs-test-server.py <<'PY'
+          from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          ROOT = Path.cwd()
+          class Handler(SimpleHTTPRequestHandler):
+              def do_GET(self):
+                  current = (ROOT / 'verification/current.txt').exists()
+                  self.directory = str(ROOT / 'orbit' if current else ROOT)
+                  path = urlsplit(self.path).path
+                  if current and path in ['/app.html', '/index-v3.html', '/lander']:
+                      self.path = '/index.html'
+                  super().do_GET()
+              def end_headers(self):
+                  self.send_header('Cache-Control', 'no-store')
+                  self.send_header('Service-Worker-Allowed', '/')
+                  super().end_headers()
+          ThreadingHTTPServer(('127.0.0.1', 8787), Handler).serve_forever()
+          PY
+          python3 /tmp/bvs-test-server.py > verification/server.log 2>&1 &
+      - name: Install the real legacy BVS app and prepare existing records
+        run: |
+          agent-browser open http://127.0.0.1:8787/
+          agent-browser wait --load networkidle
+          agent-browser eval '(async () => {await navigator.serviceWorker.ready;const keys=await caches.keys();if(!keys.includes("bvs-protocol-v14"))throw new Error("Legacy worker was not installed: "+keys);const now=new Date();const day=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;localStorage.setItem("bvs_v3_state",JSON.stringify({profile:{name:"Upgrade test",stage:"B"},events:{[day+"|vitd|08:00"]:"taken"},water:{[day]:250}}));localStorage.setItem("bvs_recovery_preservation_test","keep-existing-records");return JSON.stringify({legacyCache:keys,recordsPrepared:true});})()' > verification/legacy-state.json
+          touch verification/current.txt
+      - name: Upgrade the old installation without clearing personal records
+        run: |
+          agent-browser open 'http://127.0.0.1:8787/update-bvs.html?lang=pt'
+          agent-browser wait --url '**/app.html?bvs=20260909-3'
+          agent-browser wait --load networkidle
+          agent-browser eval '(async () => {const ok=(test,message)=>{if(!test)throw new Error(message)};ok(!!document.querySelector("meta[name=bvs-release]"),"New app missing");const saved=JSON.parse(localStorage.getItem("bvs_orbit_v1"));ok(saved.profile.name==="Upgrade test","Profile not migrated");ok(localStorage.getItem("bvs_recovery_preservation_test")==="keep-existing-records","Existing browser data deleted");ok(!!localStorage.getItem("bvs_v3_state"),"Original backup deleted");ok(saved.events.some(e=>e.type==="supplement"&&e.key==="D3K2"&&e.status==="taken"),"Taken record not migrated");ok(saved.events.some(e=>e.type==="water"&&e.amount===250),"Hydration not migrated");const keys=await caches.keys();ok(keys.includes("bvs-orbit-2026-09-09.3"),"New offline cache missing");ok(!keys.includes("bvs-protocol-v14"),"Legacy asset cache still present");return JSON.stringify({newApp:true,profilePreserved:true,originalBackupPreserved:true,takenRecordPreserved:true,hydrationPreserved:true,caches:keys,url:location.href});})()' > verification/migration-result.json
+          agent-browser screenshot verification/after-upgrade.png
+          agent-browser close
+      - name: Verify public production routes and the recovery link
+        run: |
+          python3 - <<'PY'
+          import urllib.request, time, json
+          routes = ['/update-bvs.html?lang=pt&release=3', '/app.html?bvs=20260909-3', '/index-v3.html', '/bvs-app-icon-192.png?v=14']
+          result=[]
+          for host in ['bvsprotocol.com', 'www.bvsprotocol.com']:
+              for path in routes:
+                  url='https://'+host+path
+                  with urllib.request.urlopen(urllib.request.Request(url,headers={'Cache-Control':'no-cache'}),timeout=25) as r:
+                      body=r.read(); content=r.headers.get('Content-Type','')
+                      assert r.status==200
+                      if '/update-bvs' in path: assert b'bvs-recovery' in body
+                      elif '.png' in path: assert body.startswith(b'\x89PNG')
+                      else: assert b'name="bvs-release"' in body
+                      result.append({'url':url,'status':r.status,'content_type':content,'cache_control':r.headers.get('Cache-Control')})
+          print(json.dumps(result,indent=2))
+          open('verification/public-routes.json','w').write(json.dumps(result,indent=2))
+          PY
+          agent-browser open 'https://bvsprotocol.com/update-bvs.html?lang=pt&release=3'
+          agent-browser wait --url '**/app.html?bvs=20260909-3'
+          agent-browser wait --load networkidle
+          agent-browser set viewport 390 844
+          agent-browser eval '(async()=>{const reg=await navigator.serviceWorker.ready;const release=await new Promise(resolve=>{const channel=new MessageChannel();channel.port1.onmessage=e=>resolve(e.data);reg.active.postMessage({type:"BVS_RELEASE_STATUS"},[channel.port2]);});if(release.release!=="2026-09-09.3")throw new Error("Incorrect worker version");return JSON.stringify({url:location.href,title:document.title,currentApp:!!document.querySelector("meta[name=bvs-release]"),webglRendered:document.getElementById("atomFallback").classList.contains("loaded"),release:release.release});})()' > verification/production-result.json
+          agent-browser screenshot verification/new-mobile.png --full
+          agent-browser errors > verification/browser-errors.txt
+      - name: Report results
+        if: always()
+        run: |
+          for file in verification/*.json verification/browser-errors.txt; do [ ! -f "$file" ] || { echo "--- $file ---"; cat "$file"; echo; }; done
+          agent-browser get url || true
+          agent-browser get text '#status' || true
+          agent-browser get text '#diagnostics' || true
+          agent-browser errors || true
+          agent-browser close || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bvs-update-verification
+          path: verification/
+          retention-days: 14
