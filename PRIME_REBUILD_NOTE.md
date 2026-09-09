@@ -1,1 +1,0 @@
-Prime rebuild uses user-supplied BVS 3D artwork as the exact visual reference for the round install icon, and keeps animated B/V/S letters upright while all spheres orbit.
