@@ -12,7 +12,14 @@ const record=(name,pass,detail)=>{report.checks.push({name,pass:!!pass,detail});
   const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
   const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
   const response=await page.goto(base,{waitUntil:'domcontentloaded',timeout:45000});
-  await page.waitForFunction(()=>window.PGC?.count===58,{timeout:30000});
+  if(live && new URL(page.url()).hostname==='rawcdn.githack.com' && await page.locator('#catalog-data').count()===0){
+   report.confirmationPage=await page.locator('body').innerText();
+   await page.screenshot({path:'qa/cdn-confirmation.png'});
+   console.log('CDN_CONFIRMATION',report.confirmationPage);
+   const confirm=page.getByRole('button',{name:/continue|proceed|open|confirm|understand/i}).or(page.getByRole('link',{name:/continue|proceed|open|confirm|understand/i})).first();
+   if(await confirm.count())await confirm.click();
+  }
+  await page.waitForFunction(()=>window.PGC?.count===58,null,{timeout:30000});
   record('Anonymous website opens',response.status()===200&&!page.url().includes('vercel.com/login'),page.url());
   record('58 catalogue products',await page.locator('#products .product-card').count()===58);
   record('Eight premium robots visible',await page.locator('.robot-card:visible').count()===8);
