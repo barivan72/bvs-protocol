@@ -1,58 +1,53 @@
 <!doctype html>
-<html lang="en-GB">
-<head>
+<html lang="en-GB"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="theme-color" content="#050a12"><meta name="bvs-recovery" content="2026-09-09.3">
-<title>Update BVS Protocol</title>
-<style>html{color-scheme:dark}body{margin:0;background:#050a12;color:#eaf3ff;font:17px/1.6 system-ui,sans-serif;min-height:100dvh;display:grid;place-items:center}main{box-sizing:border-box;width:min(540px,100%);padding:36px 24px;text-align:center}img{width:112px;height:112px;object-fit:contain}h1{font-size:30px;line-height:1.2}p{color:#b9cde3}button,a.action{box-sizing:border-box;display:inline-block;font:inherit;font-weight:650;border:1px solid #85b9e6;border-radius:28px;padding:13px 22px;color:#071525;background:#a9d4f6;cursor:pointer;text-decoration:none}button:disabled{opacity:.65;cursor:wait}#status{padding:18px;border:1px solid #29445f;border-radius:18px;min-height:54px}small{display:block;color:#a9bed3;margin:18px 0}details{text-align:left;margin-top:28px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}a{color:#b5dcff}[hidden]{display:none!important}</style>
-</head>
-<body><main>
+<title>Update BVS Protocol</title><link rel="icon" href="/assets/bvs-icon-192-r3.png">
+<style>html{color-scheme:dark}body{margin:0;background:#050a12;color:#eaf3ff;font:17px/1.6 system-ui,sans-serif;min-height:100dvh;display:grid;place-items:center}main{box-sizing:border-box;width:min(540px,100%);padding:36px 24px;text-align:center}img{width:112px;height:112px;object-fit:contain}h1{font-size:30px;line-height:1.2}p{color:#b9cde3}button,a.action{box-sizing:border-box;display:inline-block;font:inherit;font-weight:650;border:1px solid #85b9e6;border-radius:28px;padding:13px 22px;color:#071525;background:#a9d4f6;cursor:pointer;text-decoration:none}#status{padding:18px;border:1px solid #29445f;border-radius:18px;min-height:54px}small{display:block;color:#a9bed3;margin:18px 0}details{text-align:left;margin-top:28px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}a{color:#b5dcff}[hidden]{display:none!important}</style>
+</head><body><main>
 <img src="/assets/bvs-icon-192-r3.png?recovery=3" alt="BVS Protocol atom">
-<h1 id="title">Updating BVS Protocol</h1>
-<p id="intro">Opening the new version without deleting your profile, calendar or history.</p>
+<h1 id="title">Updating BVS Protocol</h1><p id="intro">Opening the new version without deleting your profile, calendar or history.</p>
 <p id="status" role="status" aria-live="polite">Checking the published app…</p>
-<button id="retry" hidden>Try again</button>
-<a id="open" class="action" href="/app.html?bvs=20260909-3" hidden>Open the new BVS</a>
-<small id="note">Keep this page open during the update. No account or new installation is required.</small>
+<button id="retry" hidden>Try again</button><a id="open" class="action" href="/app.html?bvs=20260909-3" hidden>Open the new BVS</a>
+<small id="note">No account or new installation is required.</small>
 <details><summary id="diagnosticTitle">Update details</summary><pre id="diagnostics"></pre></details>
-</main>
-<script>
+</main><script>
 (() => {
 'use strict';
-const pt=new URLSearchParams(location.search).get('lang')==='pt'||navigator.language.toLowerCase().startsWith('pt');
-const text=pt?{title:'Atualizando o BVS Protocol',intro:'Abrindo a versão nova sem apagar seu perfil, calendário ou histórico.',checking:'Verificando a versão publicada…',installing:'Atualizando os arquivos do aplicativo…',done:'Atualização concluída. Abrindo o BVS novo…',failed:'Não foi possível concluir a atualização neste navegador. Abra este mesmo link no Chrome ou Safari e tente novamente.',retry:'Tentar novamente',open:'Abrir o BVS novo',note:'Mantenha esta página aberta durante a atualização. Não é necessário criar conta nem reinstalar.',details:'Detalhes da atualização'}:{title:'Updating BVS Protocol',intro:'Opening the new version without deleting your profile, calendar or history.',checking:'Checking the published app…',installing:'Updating the app files…',done:'Update complete. Opening the new BVS…',failed:'This browser could not complete the update. Open this same link in Chrome or Safari and try again.',retry:'Try again',open:'Open the new BVS',note:'Keep this page open during the update. No account or new installation is required.',details:'Update details'};
-const $=id=>document.getElementById(id);for(const [id,key] of Object.entries({title:'title',intro:'intro',status:'checking',retry:'retry',open:'open',note:'note',diagnosticTitle:'details'}))$(id).textContent=text[key];
+const params=new URLSearchParams(location.search);
+const pt=params.get('lang')==='pt'||navigator.language.toLowerCase().startsWith('pt');
+const t=pt?{title:'Atualizando o BVS Protocol',intro:'Abrindo a versão nova sem apagar seu perfil, calendário ou histórico.',checking:'Verificando a versão publicada…',refresh:'Substituindo os arquivos antigos do aplicativo…',done:'Versão nova verificada. Abrindo o BVS…',failed:'Não foi possível atualizar neste navegador. Abra este mesmo link no Chrome ou Safari e tente novamente.',retry:'Tentar novamente',open:'Abrir o BVS novo',note:'Não é necessário criar conta nem reinstalar. Seus registros não são apagados.',details:'Detalhes da atualização'}:{title:'Updating BVS Protocol',intro:'Opening the new version without deleting your profile, calendar or history.',checking:'Checking the published app…',refresh:'Replacing the old app files…',done:'New version verified. Opening BVS…',failed:'This browser could not update. Open this same link in Chrome or Safari and try again.',retry:'Try again',open:'Open the new BVS',note:'No account or new installation is required. Your records are not deleted.',details:'Update details'};
+const $=id=>document.getElementById(id);
+for(const [id,key] of Object.entries({title:'title',intro:'intro',status:'checking',retry:'retry',open:'open',note:'note',diagnosticTitle:'details'}))$(id).textContent=t[key];
 document.documentElement.lang=pt?'pt-BR':'en-GB';
-const appURL='/app.html?bvs=20260909-3';let busy=false;const details=[];
-function log(message){details.push(message);$('diagnostics').textContent=details.join('\n')}
-function timeout(promise,ms,label){let timer;return Promise.race([promise,new Promise((_,reject)=>timer=setTimeout(()=>reject(new Error(label)),ms))]).finally(()=>clearTimeout(timer))}
-function activated(worker){if(!worker)return Promise.reject(new Error('No update worker'));if(worker.state==='activated')return Promise.resolve();return new Promise((resolve,reject)=>{const check=()=>{if(worker.state==='activated'){worker.removeEventListener('statechange',check);resolve()}else if(worker.state==='redundant'){worker.removeEventListener('statechange',check);reject(new Error('Update could not install'))}};worker.addEventListener('statechange',check);check()})}
+const appURL='/app.html?bvs=20260909-3';let busy=false;
+function log(message){$('diagnostics').textContent+=message+'\n'}
+function bounded(promise,label){let timer;return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(label)),15000)})]).finally(()=>clearTimeout(timer))}
 async function run(){
-if(busy)return;busy=true;$('retry').hidden=true;$('open').hidden=true;$('status').textContent=text.checking;details.length=0;
+if(busy)return;busy=true;$('retry').hidden=true;$('open').hidden=true;$('status').textContent=t.checking;
 try{
-// Read/write neither localStorage nor IndexedDB. Personal records are untouched.
-const response=await fetch(appURL+'&check='+Date.now(),{cache:'no-store',redirect:'follow'});
-const html=await response.text();if(!response.ok||!html.includes('name="bvs-release"'))throw new Error('Current app did not reach this browser');
-log('Current app verified over HTTPS.');
-if('serviceWorker' in navigator){
-$('status').textContent=text.installing;
-const script=await fetch('/sw.js?verify='+Date.now(),{cache:'no-store'});const source=await script.text();
-if(!script.ok||!source.includes('BVS_RELEASE_STATUS'))throw new Error('The update service has not reached this connection yet');
-const reg=await timeout(navigator.serviceWorker.register('/sw.js',{scope:'/',updateViaCache:'none'}),20000,'Service worker registration timed out');
-await timeout(reg.update(),20000,'Update check timed out');
-const worker=reg.installing||reg.waiting||reg.active;
-if(reg.waiting)reg.waiting.postMessage({type:'BVS_SKIP_WAITING'});
-await timeout(activated(worker),45000,'Update installation timed out');
-const status=await timeout(new Promise(resolve=>{const channel=new MessageChannel();channel.port1.onmessage=event=>{channel.port1.close();resolve(event.data)};reg.active.postMessage({type:'BVS_RELEASE_STATUS'},[channel.port2])}),5000,'Update did not acknowledge its version');
-if(status?.release!=='2026-09-09.3')throw new Error('A previous offline app is still active');
-log('Offline app updated: '+status.release);
-}else log('Online app verified; this browser does not support offline installation.');
-log('Profile, calendar and history were not deleted.');
-$('status').textContent=text.done;$('open').hidden=false;
-location.replace(appURL);
-}catch(error){log(String(error.message||error));$('status').textContent=text.failed;$('retry').hidden=false;
-}finally{busy=false}
+const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);let response,html;
+try{response=await fetch(appURL+'&check='+Date.now(),{cache:'no-store',signal:controller.signal});html=await response.text()}finally{clearTimeout(timer)}
+if(!response.ok||!html.includes('name="bvs-release"'))throw new Error('The current app did not reach this browser.');
+log('Current app verified.');
+if(params.get('clean')!=='3'&&'serviceWorker' in navigator){
+$('status').textContent=t.refresh;
+const registrations=await bounded(navigator.serviceWorker.getRegistrations(),'Could not check the offline app.');
+const bvs=registrations.filter(reg=>new URL(reg.scope).origin===location.origin&&new URL(reg.scope).pathname==='/');
+// Reset only BVS offline code. Never read, clear or overwrite localStorage or IndexedDB.
+await bounded(Promise.all(bvs.map(reg=>reg.unregister())),'Could not refresh the offline app.');
+log('Old offline registration removed; personal records untouched.');
+if(bvs.length||navigator.serviceWorker.controller){
+const next=new URL('/update-bvs.html',location.origin);next.searchParams.set('lang',pt?'pt':'en');next.searchParams.set('clean','3');next.searchParams.set('check',String(Date.now()));
+location.replace(next.href);return;
 }
-$('retry').addEventListener('click',run);run();
+}
+if('caches' in window){try{const names=await bounded(caches.keys(),'Cache check timed out.');await bounded(Promise.all(names.filter(name=>name.startsWith('bvs-')&&name!=='bvs-orbit-2026-09-09.3').map(name=>caches.delete(name))),'Old asset cache refresh timed out.')}catch(error){log('Non-essential cache cleanup skipped.')}}
+log('Profile, calendar and history were not deleted.');$('status').textContent=t.done;$('open').hidden=false;
+location.replace(appURL);
+}catch(error){log(String(error.message||error));$('status').textContent=t.failed;$('retry').hidden=false}
+finally{busy=false}
+}
+$('retry').addEventListener('click',()=>{const next=new URL('/update-bvs.html',location.origin);next.searchParams.set('lang',pt?'pt':'en');next.searchParams.set('retry',String(Date.now()));location.replace(next.href)});
+run();
 })();
-</script>
-</body></html>
+</script></body></html>
