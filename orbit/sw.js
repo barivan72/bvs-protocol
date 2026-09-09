@@ -1,4 +1,4 @@
-const RELEASE = '2026-09-09.2';
+const RELEASE = '2026-09-09.3';
 const CACHE = 'bvs-orbit-' + RELEASE;
 const SHELL = '/index.html?v=20260909-1';
 const CORE = [SHELL, '/style.css?v=20260909-1', '/data.js?v=20260909-1',
@@ -16,7 +16,7 @@ function hasCurrentApp(html) { return html.includes('name="bvs-release"'); }
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    // A failed download must never replace the working offline app.
+    // Never replace a working offline app until every required file is available.
     await Promise.all(CORE.map(async url => {
       const response = await fetch(url, { cache: 'reload' });
       if (!response.ok) throw new Error('BVS update download failed');
@@ -32,25 +32,42 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
+    // Only remove obsolete BVS asset caches. Never delete personal record storage.
     await Promise.all(keys.filter(key => key.startsWith('bvs-') && key !== CACHE)
       .map(key => caches.delete(key)));
     await self.clients.claim();
+    // An older worker may have served its old homepage for the update URL.
+    // Reload only the explicitly requested recovery page, never unrelated tabs.
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    await Promise.all(windows.map(async client => {
+      const url = new URL(client.url);
+      if (url.origin !== self.location.origin || url.pathname !== '/update-bvs.html' || url.searchParams.has('activated')) return;
+      url.searchParams.set('activated', RELEASE);
+      try { await client.navigate(url.href); } catch (_) { /* Page may already have navigated. */ }
+    }));
   })());
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'BVS_RELEASE_STATUS') {
+    event.ports[0]?.postMessage({ release: RELEASE, cache: CACHE });
+  }
+  if (event.data?.type === 'BVS_SKIP_WAITING') event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  // The recovery tool always comes from the network, never an old offline shell.
+  if (url.pathname === '/update-bvs.html' || url.pathname === '/sw.js') {
+    event.respondWith(fetch(request, { cache: 'no-store' }));
+    return;
+  }
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
-    // Direct icon and manifest URLs must keep their actual file response.
-    const appPage = ['/', '/index.html', '/index-v3.html', '/lander'].includes(url.pathname);
-    if (request.mode === 'navigate' && appPage) {
-      if (url.pathname === '/index-v3.html') {
-        url.pathname = '/';
-        return Response.redirect(url.href, 302);
-      }
+    const appPages = ['/', '/index.html', '/app.html', '/index-v3.html', '/lander', '/orbit', '/orbit/', '/orbit/index.html'];
+    if (request.mode === 'navigate' && appPages.includes(url.pathname)) {
       try {
         const response = await fetch(request, { cache: 'no-store' });
         if (response.ok && hasCurrentApp(await response.clone().text())) return response;
@@ -59,15 +76,12 @@ self.addEventListener('fetch', event => {
         status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' }
       });
     }
-    // Keep an installed release's scripts, styles and 3D assets together.
     if (url.pathname !== '/manifest.webmanifest') {
       const saved = await cache.match(request);
       if (saved) return saved;
     }
     try { return await fetch(request, { cache: 'no-cache' }); }
-    catch (_) {
-      return (await cache.match(request)) || new Response('Offline', { status: 503 });
-    }
+    catch (_) { return (await cache.match(request)) || new Response('Offline', { status: 503 }); }
   })());
 });
 
