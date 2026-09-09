@@ -4,10 +4,12 @@
   "buildCommand": "",
   "installCommand": "",
   "outputDirectory": "orbit",
+  "redirects": [
+    { "source": "/index-v3.html", "destination": "/app.html", "permanent": false },
+    { "source": "/lander", "destination": "/app.html", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/app.html", "destination": "/index.html" },
-    { "source": "/index-v3.html", "destination": "/index.html" },
-    { "source": "/lander", "destination": "/index.html" },
     { "source": "/orbit", "destination": "/index.html" },
     { "source": "/orbit/", "destination": "/index.html" },
     { "source": "/orbit/index.html", "destination": "/index.html" },
