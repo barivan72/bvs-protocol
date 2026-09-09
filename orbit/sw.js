@@ -1,4 +1,4 @@
-const RELEASE = '2026-09-09.1';
+const RELEASE = '2026-09-09.2';
 const CACHE = 'bvs-orbit-' + RELEASE;
 const SHELL = '/index.html?v=20260909-1';
 const CORE = [SHELL, '/style.css?v=20260909-1', '/data.js?v=20260909-1',
@@ -44,7 +44,9 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
-    if (request.mode === 'navigate') {
+    // Direct icon and manifest URLs must keep their actual file response.
+    const appPage = ['/', '/index.html', '/index-v3.html', '/lander'].includes(url.pathname);
+    if (request.mode === 'navigate' && appPage) {
       if (url.pathname === '/index-v3.html') {
         url.pathname = '/';
         return Response.redirect(url.href, 302);
