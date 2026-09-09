@@ -7,53 +7,79 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: bvs-public-recovery
+  group: bvs-public-recovery-browser-v2
   cancel-in-progress: true
 jobs:
   public-update:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
-      - name: Check public update, app and legacy icon routes
+      - name: Prepare navigation-aware browser checks
         run: |
           mkdir -p verification
-          python3 - <<'PY'
-          import urllib.request, json
-          rows=[]
-          for host in ['bvsprotocol.com','www.bvsprotocol.com']:
-              for path in ['/update-bvs.html?lang=pt&release=3','/app.html?bvs=20260909-3','/index-v3.html','/bvs-app-icon-192.png?v=14']:
-                  url='https://'+host+path
-                  with urllib.request.urlopen(urllib.request.Request(url,headers={'Cache-Control':'no-cache'}),timeout=15) as r:
-                      data=r.read()
-                      assert r.status==200
-                      assert (b'bvs-recovery' in data if '/update-bvs' in path else data.startswith(b'\x89PNG') if '.png' in path else b'name="bvs-release"' in data),url
-                      rows.append({'url':url,'status':r.status,'type':r.headers.get('Content-Type'),'cache':r.headers.get('Cache-Control')})
-          open('verification/routes.json','w').write(json.dumps(rows,indent=2));print(json.dumps(rows,indent=2))
-          PY
-      - name: Install browser tool
+          npm install --no-save playwright
+      - name: Verify routes, update navigation, existing records and legacy data migration
         run: |
-          npm install -g agent-browser
-          echo "AGENT_BROWSER_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
-      - name: Open app and record hydration before update
-        run: |
-          timeout 45s agent-browser open https://bvsprotocol.com/
-          timeout 20s agent-browser wait --load networkidle
-          timeout 15s agent-browser eval '(() => {document.querySelector("[data-water=\"250\"]").click();document.querySelector("#scheduleList [data-check]").click();localStorage.setItem("bvs_update_test","preserve");return JSON.stringify({water:document.getElementById("waterAmount").textContent,taken:document.getElementById("takenCount").textContent});})()' > verification/before.json
-      - name: Follow the public update link and verify the new app
-        run: |
-          timeout 45s agent-browser open 'https://bvsprotocol.com/update-bvs.html?lang=pt&release=3'
-          timeout 50s agent-browser wait --url '**/app.html?bvs=20260909-3'
-          timeout 20s agent-browser wait --load networkidle
-          timeout 15s agent-browser eval '(() => {const saved=JSON.parse(localStorage.getItem("bvs_orbit_v1"));if(localStorage.getItem("bvs_update_test")!=="preserve")throw new Error("Existing storage deleted");if(!saved.events.some(e=>e.type==="water"&&e.amount===250))throw new Error("Water record missing");if(!saved.events.some(e=>e.type==="supplement"&&e.status==="taken"))throw new Error("Taken record missing");if(!document.querySelector("meta[name=bvs-release]"))throw new Error("Old app");return JSON.stringify({url:location.href,newApp:true,waterPreserved:true,takenPreserved:true,otherStoragePreserved:true,webgl:document.getElementById("atomFallback").classList.contains("loaded")});})()' > verification/after.json
-          timeout 10s agent-browser set viewport 390 844
-          timeout 20s agent-browser screenshot verification/new-mobile.png --full
-      - name: Report results and any update errors
-        if: always()
-        run: |
-          for file in verification/*.json; do [ ! -f "$file" ] || { echo "--- $file ---"; cat "$file"; echo; }; done
-          timeout 10s agent-browser eval 'JSON.stringify({url:location.href,status:document.getElementById("status")?.textContent,details:document.getElementById("diagnostics")?.textContent,release:document.querySelector("meta[name=bvs-release]")?.content})' || true
-          timeout 10s agent-browser errors || true
-          timeout 10s agent-browser close || true
+          timeout 150s node <<'JS'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async () => {
+            const report={routes:[],checks:[],errors:[]};
+            const browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',headless:true,args:['--no-sandbox']});
+            let page;
+            try {
+              for(const host of ['bvsprotocol.com','www.bvsprotocol.com']) {
+                for(const path of ['/update-bvs.html?lang=pt&release=3','/app.html?bvs=20260909-3','/index-v3.html','/bvs-app-icon-192.png?v=14']) {
+                  const r=await fetch('https://'+host+path,{signal:AbortSignal.timeout(12000),cache:'no-store'});
+                  const body=Buffer.from(await r.arrayBuffer());
+                  const valid=path.includes('.png')?body.subarray(0,4).equals(Buffer.from([137,80,78,71])):body.includes(Buffer.from(path.includes('update-bvs')?'bvs-recovery':'name="bvs-release"'));
+                  report.routes.push({url:'https://'+host+path,finalUrl:r.url,status:r.status,valid});
+                  if(!r.ok||!valid)throw new Error('Public route failed: '+path);
+                }
+              }
+              for(const legacy of [false,true]) {
+                const context=await browser.newContext({viewport:{width:390,height:844}});
+                page=await context.newPage();page.setDefaultTimeout(25000);page.setDefaultNavigationTimeout(25000);
+                page.on('pageerror',e=>report.errors.push(String(e)));
+                await page.goto('https://bvsprotocol.com/',{waitUntil:'networkidle'});
+                await page.evaluate(async()=>{await navigator.serviceWorker.ready;});
+                await page.evaluate(legacy=>{
+                  localStorage.setItem('bvs_update_test','preserve');
+                  if(legacy){
+                    const d=new Date();const day=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    localStorage.setItem('bvs_v3_state',JSON.stringify({profile:{name:'Upgrade test',stage:'B'},events:{[day+'|vitd|08:00']:'taken'},water:{[day]:250}}));
+                    localStorage.removeItem('bvs_orbit_v1');
+                  } else {
+                    document.querySelector('[data-water="250"]').click();
+                    document.querySelector('#scheduleList [data-check]').click();
+                  }
+                },legacy);
+                await page.goto('https://bvsprotocol.com/update-bvs.html?lang=pt&release=3',{waitUntil:'domcontentloaded'});
+                await page.waitForURL(url=>url.pathname==='/app.html',{waitUntil:'networkidle',timeout:30000});
+                const result=await page.evaluate(legacy=>{
+                  const saved=JSON.parse(localStorage.getItem('bvs_orbit_v1'));
+                  if(localStorage.getItem('bvs_update_test')!=='preserve')throw new Error('Other storage was deleted');
+                  if(!saved.events.some(e=>e.type==='water'&&e.amount===250))throw new Error('Hydration not retained');
+                  if(!saved.events.some(e=>e.type==='supplement'&&e.status==='taken'))throw new Error('Taken record not retained');
+                  if(legacy&&(saved.profile.name!=='Upgrade test'||!localStorage.getItem('bvs_v3_state')))throw new Error('Legacy profile or backup not retained');
+                  if(!document.querySelector('meta[name=bvs-release]'))throw new Error('Old app returned');
+                  return {test:legacy?'legacy-record-migration':'existing-record-update',url:location.href,newApp:true,hydrationPreserved:true,takenPreserved:true,otherDataPreserved:true,profilePreserved:legacy?saved.profile.name==='Upgrade test':true,webgl:document.getElementById('atomFallback').classList.contains('loaded')};
+                },legacy);
+                report.checks.push(result);
+                if(!legacy)await page.screenshot({path:'verification/new-mobile.png',fullPage:true});
+                await context.close();page=null;
+              }
+              report.passed=true;
+            } catch(error) {
+              report.passed=false;report.failure=String(error);
+              if(page){try{report.page=await page.evaluate(()=>({url:location.href,status:document.getElementById('status')?.textContent,details:document.getElementById('diagnostics')?.textContent}));await page.screenshot({path:'verification/update-error.png',fullPage:true});}catch(e){report.diagnosticError=String(e)}}
+              process.exitCode=1;
+            } finally {
+              fs.writeFileSync('verification/report.json',JSON.stringify(report,null,2));
+              console.log(JSON.stringify(report,null,2));await browser.close();
+            }
+          })().catch(error=>{console.error(error);process.exit(1)});
+          JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
