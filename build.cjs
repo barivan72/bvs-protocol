@@ -1,0 +1,16 @@
+'use strict';
+const fs = require('node:fs');
+const path = require('node:path');
+const zlib = require('node:zlib');
+const crypto = require('node:crypto');
+const restorePart = require('./restore-part.js');
+const expected = '7670bdc7a1bf13f269afbc025480031ecfc4dacbb6c762d2634f9382f74b77a0';
+const parts = Array.from({length:8}, (_, i) => Buffer.from(restorePart(i + 1, fs.readFileSync(path.join(__dirname, `payload-${String(i + 1).padStart(2, '0')}.bin`)))));
+const html = zlib.gunzipSync(Buffer.concat(parts));
+const actual = crypto.createHash('sha256').update(html).digest('hex');
+if (actual !== expected || html.length !== 264212) throw new Error('Release integrity check failed; publication stopped.');
+const output = path.join(__dirname, 'public');
+fs.mkdirSync(output, {recursive:true});
+fs.writeFileSync(path.join(output, 'index.html'), html);
+fs.writeFileSync(path.join(output, 'release.json'), JSON.stringify({project:'Pet Gadget Club',version:'2026.09.09-robots-photos.2',listings:58,premiumRobots:8,sha256:actual}, null, 2));
+console.log('Verified Pet Gadget Club: 264212 bytes, 58 listings, 8 premium robots.');
