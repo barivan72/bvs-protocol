@@ -5,6 +5,9 @@ on:
     paths: ['.github/workflows/pgc-public-check.yml', 'build.cjs', 'browser-check.cjs']
 permissions:
   contents: write
+concurrency:
+  group: pet-gadget-club-public-release
+  cancel-in-progress: true
 jobs:
   verify-and-publish:
     if: github.ref == 'refs/heads/pet-gadget-club-live-20260909'
@@ -16,7 +19,7 @@ jobs:
         run: node build.cjs
       - name: Prepare browser verification
         run: |
-          npm install --prefix "$RUNNER_TEMP/pgc-qa" agent-browser --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/pgc-qa" agent-browser playwright-core --no-audit --no-fund
           echo "$RUNNER_TEMP/pgc-qa/node_modules/.bin" >> "$GITHUB_PATH"
           echo "NODE_PATH=$RUNNER_TEMP/pgc-qa/node_modules" >> "$GITHUB_ENV"
           echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
