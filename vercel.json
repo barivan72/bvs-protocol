@@ -13,6 +13,10 @@
     { "source": "/orbit", "destination": "/index.html" },
     { "source": "/orbit/", "destination": "/index.html" },
     { "source": "/orbit/index.html", "destination": "/index.html" },
+    { "source": "/orbit/app.html", "destination": "/index.html" },
+    { "source": "/orbit/sw.js", "destination": "/sw.js" },
+    { "source": "/orbit/manifest.webmanifest", "destination": "/manifest.webmanifest" },
+    { "source": "/orbit/update-bvs.html", "destination": "/update-bvs.html" },
     { "source": "/bvs-app-icon-192.png", "destination": "/assets/bvs-icon-192-r3.png" },
     { "source": "/bvs-app-icon-512.png", "destination": "/assets/bvs-icon-512-r3.png" }
   ],
@@ -42,11 +46,30 @@
       ]
     },
     {
+      "source": "/orbit/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" },
+        { "key": "Service-Worker-Allowed", "value": "/" },
+        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
+      ]
+    },
+    {
       "source": "/manifest.webmanifest",
       "headers": [
         { "key": "Content-Type", "value": "application/manifest+json" },
         { "key": "Cache-Control", "value": "no-cache" }
       ]
+    },
+    {
+      "source": "/orbit/manifest.webmanifest",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    },
+    {
+      "source": "/orbit/update-bvs.html",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
     }
   ]
 }
