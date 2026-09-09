@@ -1,4 +1,4 @@
-name: Deploy BVS Protocol to GitHub Pages
+name: Publish BVS official-site redirect
 
 on:
   push:
@@ -20,17 +20,35 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Prepare canonical-site redirect instead of publishing the obsolete app
+        run: |
+          mkdir -p _site
+          cat > _site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><meta http-equiv="refresh" content="0;url=https://bvsprotocol.com/"><link rel="canonical" href="https://bvsprotocol.com/"><title>BVS Protocol — Official website</title><style>body{margin:0;min-height:100vh;display:grid;place-content:center;background:#050a12;color:#edf5ff;font:18px system-ui,sans-serif;text-align:center;padding:24px}a{color:#9bcaff}</style></head><body><main><h1>BVS Protocol</h1><p>The current BVS app is on our official website.</p><p><a href="https://bvsprotocol.com/">Open BVS Protocol</a></p></main><script>location.replace('https://bvsprotocol.com/'+location.hash)</script></body></html>
+          HTML
+          cp _site/index.html _site/404.html
+          touch _site/.nojekyll
+          cat > _site/sw.js <<'JS'
+          // Retire the obsolete GitHub Pages app without deleting personal records.
+          self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
+          self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', event => {
+            if (event.request.mode === 'navigate') event.respondWith(Promise.resolve(Response.redirect('https://bvsprotocol.com/', 302)));
+          });
+          JS
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Upload site
+      - name: Upload official-site redirect
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
-      - name: Deploy to GitHub Pages
+          path: '_site'
+      - name: Publish redirect
         id: deployment
         uses: actions/deploy-pages@v4
