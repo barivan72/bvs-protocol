@@ -1,75 +1,31 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "buildCommand": "",
-  "installCommand": "",
-  "outputDirectory": "orbit",
-  "redirects": [
-    { "source": "/index-v3.html", "destination": "/app.html", "permanent": false },
-    { "source": "/lander", "destination": "/app.html", "permanent": false }
+  "$schema":"https://openapi.vercel.sh/vercel.json",
+  "framework":null,
+  "buildCommand":"node scripts/build-static.mjs",
+  "installCommand":"",
+  "outputDirectory":"orbit",
+  "redirects":[
+    {"source":"/index-v3.html","destination":"/app.html","permanent":false},
+    {"source":"/lander","destination":"/app.html","permanent":false}
   ],
-  "rewrites": [
-    { "source": "/app.html", "destination": "/index.html" },
-    { "source": "/orbit", "destination": "/index.html" },
-    { "source": "/orbit/", "destination": "/index.html" },
-    { "source": "/orbit/index.html", "destination": "/index.html" },
-    { "source": "/orbit/app.html", "destination": "/index.html" },
-    { "source": "/orbit/sw.js", "destination": "/sw.js" },
-    { "source": "/orbit/manifest.webmanifest", "destination": "/manifest.webmanifest" },
-    { "source": "/orbit/update-bvs.html", "destination": "/update-bvs.html" },
-    { "source": "/bvs-app-icon-192.png", "destination": "/assets/bvs-icon-192-r3.png" },
-    { "source": "/bvs-app-icon-512.png", "destination": "/assets/bvs-icon-512-r3.png" }
+  "rewrites":[
+    {"source":"/orbit","destination":"/index.html"},
+    {"source":"/orbit/","destination":"/index.html"},
+    {"source":"/orbit/index.html","destination":"/index.html"},
+    {"source":"/orbit/app.html","destination":"/app.html"},
+    {"source":"/orbit/sw.js","destination":"/sw.js"},
+    {"source":"/orbit/manifest.webmanifest","destination":"/manifest.webmanifest"},
+    {"source":"/orbit/update-bvs.html","destination":"/update-bvs.html"},
+    {"source":"/bvs-app-icon-192.png","destination":"/assets/bvs-icon-192-r3.png"},
+    {"source":"/bvs-app-icon-512.png","destination":"/assets/bvs-icon-512-r3.png"}
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/update-bvs.html",
-      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
-    },
-    {
-      "source": "/app.html",
-      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
-    },
-    {
-      "source": "/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
-      ]
-    },
-    {
-      "source": "/orbit/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store" },
-        { "key": "Service-Worker-Allowed", "value": "/" },
-        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
-      ]
-    },
-    {
-      "source": "/manifest.webmanifest",
-      "headers": [
-        { "key": "Content-Type", "value": "application/manifest+json" },
-        { "key": "Cache-Control", "value": "no-cache" }
-      ]
-    },
-    {
-      "source": "/orbit/manifest.webmanifest",
-      "headers": [
-        { "key": "Content-Type", "value": "application/manifest+json" },
-        { "key": "Cache-Control", "value": "no-cache" }
-      ]
-    },
-    {
-      "source": "/orbit/update-bvs.html",
-      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
-    }
+  "headers":[
+    {"source":"/(.*)","headers":[{"key":"X-Content-Type-Options","value":"nosniff"},{"key":"Referrer-Policy","value":"strict-origin-when-cross-origin"},{"key":"X-Frame-Options","value":"SAMEORIGIN"},{"key":"Cache-Control","value":"public, max-age=0, must-revalidate"}]},
+    {"source":"/","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-BVS-Updater","value":"2026-09-09.5"}]},
+    {"source":"/(.*).html","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-BVS-Updater","value":"2026-09-09.5"}]},
+    {"source":"/sw.js","headers":[{"key":"Cache-Control","value":"no-store"},{"key":"Service-Worker-Allowed","value":"/"}]},
+    {"source":"/orbit/sw.js","headers":[{"key":"Cache-Control","value":"no-store"},{"key":"Service-Worker-Allowed","value":"/"},{"key":"Content-Type","value":"application/javascript; charset=utf-8"}]},
+    {"source":"/manifest.webmanifest","headers":[{"key":"Content-Type","value":"application/manifest+json"},{"key":"Cache-Control","value":"no-cache"}]},
+    {"source":"/orbit/manifest.webmanifest","headers":[{"key":"Content-Type","value":"application/manifest+json"},{"key":"Cache-Control","value":"no-cache"}]}
   ]
 }
