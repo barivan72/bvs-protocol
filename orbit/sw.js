@@ -39,12 +39,13 @@ self.addEventListener('activate', event => {
     // An older worker may have served its old homepage for the update URL.
     // Reload only the explicitly requested recovery page, never unrelated tabs.
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    await Promise.all(windows.map(async client => {
+    for (const client of windows) {
       const url = new URL(client.url);
-      if (url.origin !== self.location.origin || url.pathname !== '/update-bvs.html' || url.searchParams.has('activated')) return;
+      if (url.origin !== self.location.origin || url.pathname !== '/update-bvs.html' || url.searchParams.has('activated')) continue;
       url.searchParams.set('activated', RELEASE);
-      try { await client.navigate(url.href); } catch (_) { /* Page may already have navigated. */ }
-    }));
+      // Do not await navigation inside activation: the new page may need activation to finish.
+      client.navigate(url.href).catch(() => { /* Page may already have navigated. */ });
+    }
   })());
 });
 
