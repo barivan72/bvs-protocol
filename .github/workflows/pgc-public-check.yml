@@ -1,0 +1,71 @@
+name: Pet Gadget Club public verification
+on:
+  push:
+    branches: [pet-gadget-club-live-20260909]
+    paths: ['.github/workflows/pgc-public-check.yml', 'build.cjs', 'browser-check.cjs']
+permissions:
+  contents: write
+concurrency:
+  group: pet-gadget-club-public-release
+  cancel-in-progress: true
+jobs:
+  verify-and-publish:
+    if: github.ref == 'refs/heads/pet-gadget-club-live-20260909'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+      - name: Reconstruct original catalogue and add app files
+        run: node build.cjs
+      - name: Prepare browser verification
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pgc-qa" agent-browser playwright-core --no-audit --no-fund
+          echo "$RUNNER_TEMP/pgc-qa/node_modules/.bin" >> "$GITHUB_PATH"
+          echo "NODE_PATH=$RUNNER_TEMP/pgc-qa/node_modules" >> "$GITHUB_ENV"
+          echo "CHROME_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          test -n "$(command -v google-chrome)"
+      - name: Verify catalogue in a real browser before publication
+        run: |
+          mkdir -p qa
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory public > /tmp/pgc-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          agent-browser --executable-path "$CHROME_PATH" open http://127.0.0.1:8765/index.html
+          agent-browser snapshot -i > qa/browser-elements.txt
+          agent-browser screenshot qa/agent-browser-check.png
+          agent-browser close
+          node browser-check.cjs
+      - name: Commit only generated public website files to the isolated Pet Gadget Club branch
+        id: publish
+        run: |
+          test "${GITHUB_REF}" = refs/heads/pet-gadget-club-live-20260909
+          git config user.name 'Pet Gadget Club Publisher'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- public
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish browser-verified Pet Gadget Club static release [skip ci]'
+            git push origin HEAD:refs/heads/pet-gadget-club-live-20260909
+          fi
+          SHA=$(git rev-parse HEAD)
+          URL="https://rawcdn.githack.com/barivan72/bvs-protocol/$SHA/public/index.html"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$URL" > qa/public-url.txt
+          echo "PUBLISHED_STATIC_URL=$URL"
+      - name: Verify the public URL without login
+        env:
+          PGC_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          agent-browser --executable-path "$CHROME_PATH" open "$PGC_URL"
+          agent-browser snapshot -i > qa/online-elements.txt
+          agent-browser screenshot qa/online-agent-browser-check.png
+          agent-browser close
+          node browser-check.cjs
+      - name: Preserve website and verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pet-gadget-club-public-release
+          path: |
+            public/
+            qa/
+          retention-days: 7

@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Pet Gadget Club",
+  "short_name": "Pet Gadgets",
+  "lang": "en-GB",
+  "start_url": "./index.html?source=app",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#183e35",
+  "description": "58 pet-tech and premium robot listings. Reference prices; purchases at external sellers.",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

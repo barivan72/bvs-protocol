@@ -1,0 +1,16 @@
+{
+  "project": "Pet Gadget Club",
+  "version": "2026.09.09-live.4",
+  "listings": 58,
+  "premiumRobots": 8,
+  "originalSha256": "7670bdc7a1bf13f269afbc025480031ecfc4dacbb6c762d2634f9382f74b77a0",
+  "sha256": "6e2c65eb1d0a804caf4b5bfef29a3f6d04a54de7c4f1aefaa6da09f03319e0b2",
+  "affiliateTracking": false,
+  "prices": "Labelled references, not live prices",
+  "photos": "External manufacturer or seller URLs",
+  "imageFix": {
+    "id": "pgc-45",
+    "source": "https://www.warmako.com/en/products/petsafe-2-meal",
+    "reason": "Previous image returned HTTP 200 but failed browser decoding"
+  }
+}
