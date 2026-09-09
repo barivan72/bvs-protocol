@@ -1,0 +1,48 @@
+name: Audit BVS mobile entry points
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/mobile-origin-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check DNS and public mobile entry points
+        run: |
+          mkdir -p audit
+          python3 - <<'PY'
+          import urllib.request,urllib.error,json,re,concurrent.futures,subprocess
+          from pathlib import Path
+          report={'dns':{},'pages':[]}
+          for host in ['bvsprotocol.com','www.bvsprotocol.com']:
+            report['dns'][host]={}
+            for typ in ['A','AAAA','CNAME','NS']:
+              for resolver in ['1.1.1.1','8.8.8.8']:
+                try: report['dns'][host][typ+'@'+resolver]=subprocess.check_output(['dig','@'+resolver,host,typ,'+noall','+answer','+time=2','+tries=1'],text=True,timeout=4).strip()
+                except Exception as e: report['dns'][host][typ+'@'+resolver]=str(e)
+          agents={'desktop':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142.0.0.0 Safari/537.36','android':'Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36','iphone':'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'}
+          urls=['https://bvsprotocol.com/','https://www.bvsprotocol.com/','http://bvsprotocol.com/','http://www.bvsprotocol.com/','https://bvsprotocol.com/app.html?bvs=20260909-4','https://bvsprotocol.com/update-bvs.html?lang=pt&retry=mobile4','https://bvsprotocol.com/orbit/','https://bvsprotocol.com/orbit/sw.js','https://bvsprotocol.com/sw.js?v=14','https://bvs-protocol.netlify.app/','https://main--bvs-protocol.netlify.app/','https://bvs-protocol.vercel.app/','https://bvs-protocol-ivanaguiarbar-4642.vercel.app/']
+          def check(task):
+            url,agent=task;result={'url':url,'agent':agent}
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':agents[agent],'Cache-Control':'no-cache'})
+              try: response=urllib.request.urlopen(req,timeout=12)
+              except urllib.error.HTTPError as e: response=e
+              with response as r:
+                html=r.read(180000).decode('utf-8','replace');release=re.search(r'name="bvs-(?:release|recovery)"\s+content="([^"]+)"',html);title=re.search(r'<title>(.*?)</title>',html,re.S)
+                result.update(status=r.status,final_url=r.geturl(),server=r.headers.get('Server'),cache=r.headers.get('Cache-Control'),release=release.group(1) if release else None,title=title.group(1) if title else None,download_button='id="downloadApp"' in html,old_page='id="enterBvs"' in html,body_sample=html[:180])
+            except Exception as e: result['error']=str(e)
+            return result
+          tasks=[(u,'android') for u in urls]+[(u,a) for u in urls[:2] for a in ['desktop','iphone']]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool: report['pages']=list(pool.map(check,tasks))
+          Path('audit/report.json').write_text(json.dumps(report,indent=2));print('BVS_AUDIT_REPORT\n'+json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bvs-mobile-origin-audit
+          path: audit/
+          retention-days: 7
