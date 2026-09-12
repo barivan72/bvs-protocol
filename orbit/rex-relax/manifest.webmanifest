@@ -1,0 +1,12 @@
+{
+  "name":"Rex Relax Therapy Mode",
+  "short_name":"Rex Relax",
+  "id":"/rex-relax/",
+  "start_url":"/rex-relax/index.html",
+  "scope":"/rex-relax/",
+  "display":"standalone",
+  "background_color":"#070806",
+  "theme_color":"#090909",
+  "description":"Private Rex Relax therapist tool for session timing, client records, consent and voice notes.",
+  "icons":[{"src":"/rex-relax/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
