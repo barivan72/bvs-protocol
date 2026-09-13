@@ -1,0 +1,56 @@
+{
+  "release": "2026.09.13.5",
+  "verification": "Complete MP3 decoding, duration, comparison of all 46 spoken segments against the source voice clips, and background music between every spoken segment.",
+  "sessions": [
+    {
+      "file": "guided-breath-body-90min.mp3",
+      "durationSeconds": 5400.048,
+      "decodedCompletely": true,
+      "spokenSegmentsVerified": 46,
+      "minimumVoiceCorrelation": 0.9849,
+      "backgroundGapsVerified": 46,
+      "minimumBackgroundRMS": 0.0402,
+      "closingGuidanceAt": 5350
+    },
+    {
+      "file": "guided-nervous-system-90min.mp3",
+      "durationSeconds": 5400.048,
+      "decodedCompletely": true,
+      "spokenSegmentsVerified": 46,
+      "minimumVoiceCorrelation": 0.9816,
+      "backgroundGapsVerified": 46,
+      "minimumBackgroundRMS": 0.03592,
+      "closingGuidanceAt": 5350
+    },
+    {
+      "file": "guided-muscle-release-90min.mp3",
+      "durationSeconds": 5400.048,
+      "decodedCompletely": true,
+      "spokenSegmentsVerified": 46,
+      "minimumVoiceCorrelation": 0.9861,
+      "backgroundGapsVerified": 46,
+      "minimumBackgroundRMS": 0.04019,
+      "closingGuidanceAt": 5350
+    },
+    {
+      "file": "guided-mindful-recovery-90min.mp3",
+      "durationSeconds": 5400.048,
+      "decodedCompletely": true,
+      "spokenSegmentsVerified": 46,
+      "minimumVoiceCorrelation": 0.9824,
+      "backgroundGapsVerified": 46,
+      "minimumBackgroundRMS": 0.03539,
+      "closingGuidanceAt": 5350
+    },
+    {
+      "file": "guided-deep-rest-90min.mp3",
+      "durationSeconds": 5400.048,
+      "decodedCompletely": true,
+      "spokenSegmentsVerified": 46,
+      "minimumVoiceCorrelation": 0.9833,
+      "backgroundGapsVerified": 46,
+      "minimumBackgroundRMS": 0.03742,
+      "closingGuidanceAt": 5350
+    }
+  ]
+}
