@@ -1,146 +1,266 @@
-/* Original music and five complete guided sessions with direct, sustained opening guidance. */
+/* 20 full-hour extended recordings and five preserved guided sessions. */
 globalThis.REX_AUDIO_V5 = {
-  "release": "2026.09.13.7",
+  "release": "2026.09.13.8",
   "tracks": [
     {
       "name": "Acoustic Revelation",
       "artist": "Indieteur",
-      "url": "https://opengameart.org/sites/default/files/Revelation_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/01-acoustic-revelation-60min.mp3",
       "id": "music-acoustic-revelation",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/Revelation_0.mp3",
+      "file": "01-acoustic-revelation-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/revelation",
+      "license": "CC0-1.0"
     },
     {
       "name": "Lifewave Piano",
       "artist": "The Cynic Project",
-      "url": "https://opengameart.org/sites/default/files/006_lifeWave2k_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/02-lifewave-piano-60min.mp3",
       "id": "music-lifewave-piano",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/006_lifeWave2k_0.mp3",
+      "file": "02-lifewave-piano-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/calm-ambient-3-lifewave-2k",
+      "license": "CC0-1.0"
     },
     {
       "name": "Peaceful Town",
       "artist": "haruta",
-      "url": "https://opengameart.org/sites/default/files/peaceful_town.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/03-peaceful-town-60min.mp3",
       "id": "music-peaceful-town",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/peaceful_town.mp3",
+      "file": "03-peaceful-town-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/peaceful-town-1",
+      "license": "CC0-1.0"
     },
     {
       "name": "Plains of Luminescence",
       "artist": "vitalezzz",
-      "url": "https://opengameart.org/sites/default/files/plains_of_luminescence_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/04-plains-of-luminescence-60min.mp3",
       "id": "music-plains-of-luminescence",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/plains_of_luminescence_0.mp3",
+      "file": "04-plains-of-luminescence-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/plains-of-luminescence",
+      "license": "CC0-1.0"
     },
     {
       "name": "Another August",
       "artist": "The Cynic Project",
-      "url": "https://opengameart.org/sites/default/files/013_Another_August_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/05-another-august-60min.mp3",
       "id": "music-another-august",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/013_Another_August_0.mp3",
+      "file": "05-another-august-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/another-august",
+      "license": "CC0-1.0"
     },
     {
       "name": "Gentle Piano",
       "artist": "Wolfgang_",
-      "url": "https://opengameart.org/sites/default/files/piano_nostalgia_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/06-gentle-piano-60min.mp3",
       "id": "music-gentle-piano",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/piano_nostalgia_0.mp3",
+      "file": "06-gentle-piano-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/regret-short-emotional-piano",
+      "license": "CC0-1.0"
     },
     {
       "name": "Peaceful Ville",
       "artist": "Bobjt",
-      "url": "https://opengameart.org/sites/default/files/peaceful_ville_2023_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/07-peaceful-ville-60min.mp3",
       "id": "music-peaceful-ville",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/peaceful_ville_2023_0.mp3",
+      "file": "07-peaceful-ville-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/peacefull-ville",
+      "license": "CC0-1.0"
     },
     {
       "name": "Pretty Jazz",
       "artist": "Alex McCulloch / Pro Sensory",
-      "url": "https://opengameart.org/sites/default/files/pretty_2.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/08-pretty-jazz-60min.mp3",
       "id": "music-pretty-jazz",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/pretty_2.mp3",
+      "file": "08-pretty-jazz-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/pretty",
+      "license": "CC0-1.0"
     },
     {
       "name": "Frets & Strings",
       "artist": "Alex McCulloch / Pro Sensory",
-      "url": "https://opengameart.org/sites/default/files/Frets.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/09-frets-and-strings-60min.mp3",
       "id": "music-frets-strings",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/Frets.mp3",
+      "file": "09-frets-and-strings-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/frets",
+      "license": "CC0-1.0"
     },
     {
       "name": "Classical Pop",
       "artist": "Alex McCulloch / Pro Sensory",
-      "url": "https://opengameart.org/sites/default/files/ClassicalPop%20%28Instrumental%29_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/10-classical-pop-60min.mp3",
       "id": "music-classical-pop",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/ClassicalPop%20%28Instrumental%29_0.mp3",
+      "file": "10-classical-pop-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/classical-pop-instrumental",
+      "license": "CC0-1.0"
     },
     {
       "name": "Dream Melody",
       "artist": "jkjkke",
-      "url": "https://opengameart.org/sites/default/files/jkjkke%20-%20dream_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/11-dream-melody-60min.mp3",
       "id": "music-dream-melody",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/jkjkke%20-%20dream_0.mp3",
+      "file": "11-dream-melody-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/mainmenu-music",
+      "license": "CC0-1.0"
     },
     {
       "name": "I Do Know",
       "artist": "Memoraphile",
-      "url": "https://opengameart.org/sites/default/files/I_Do_Know_by_Memoraphile_CC0_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/12-i-do-know-60min.mp3",
       "id": "music-i-do-know",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/I_Do_Know_by_Memoraphile_CC0_0.mp3",
+      "file": "12-i-do-know-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/i-do-know",
+      "license": "CC0-1.0"
     },
     {
       "name": "Vaporware Piano",
       "artist": "The Cynic Project",
-      "url": "https://opengameart.org/sites/default/files/003_Vaporware_2.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/13-vaporware-piano-60min.mp3",
       "id": "music-vaporware-piano",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/003_Vaporware_2.mp3",
+      "file": "13-vaporware-piano-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/calm-piano-1-vaporware",
+      "license": "CC0-1.0"
     },
     {
       "name": "Gone Fishin' Chill",
       "artist": "iamoneabe",
-      "url": "https://opengameart.org/sites/default/files/gonefishin_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/14-gone-fishin-chill-60min.mp3",
       "id": "music-gone-fishin-chill",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/gonefishin_0.mp3",
+      "file": "14-gone-fishin-chill-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/gone-fishin-0",
+      "license": "CC0-1.0"
     },
     {
       "name": "November Snow",
       "artist": "The Cynic Project",
-      "url": "https://opengameart.org/sites/default/files/155%20November_snow-33_tape_leveled.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/15-november-snow-60min.mp3",
       "id": "music-november-snow",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/155%20November_snow-33_tape_leveled.mp3",
+      "file": "15-november-snow-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/november-snow",
+      "license": "CC0-1.0"
     },
     {
       "name": "Calm Journey",
       "artist": "The Cynic Project",
-      "url": "https://opengameart.org/sites/default/files/001_Synthwave_4k_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/16-calm-journey-60min.mp3",
       "id": "music-calm-journey",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/001_Synthwave_4k_0.mp3",
+      "file": "16-calm-journey-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/calm-ambient-1-synthwave-4k",
+      "license": "CC0-1.0"
     },
     {
       "name": "Next to You",
       "artist": "Joth",
-      "url": "https://opengameart.org/sites/default/files/Next%20to%20You.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/17-next-to-you-60min.mp3",
       "id": "music-next-to-you",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/Next%20to%20You.mp3",
+      "file": "17-next-to-you-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/next-to-you",
+      "license": "CC0-1.0"
     },
     {
       "name": "Near and Far",
       "artist": "Joth",
-      "url": "https://opengameart.org/sites/default/files/Near%20and%20Far.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/18-near-and-far-60min.mp3",
       "id": "music-near-and-far",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/Near%20and%20Far.mp3",
+      "file": "18-near-and-far-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/near-and-far",
+      "license": "CC0-1.0"
     },
     {
       "name": "Sirens in Darkness",
       "artist": "The Cynic Project",
-      "url": "https://opengameart.org/sites/default/files/012_Sirens_in_Darkness_0.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/19-sirens-in-darkness-60min.mp3",
       "id": "music-sirens-in-darkness",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/012_Sirens_in_Darkness_0.mp3",
+      "file": "19-sirens-in-darkness-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/sirens-in-darkness",
+      "license": "CC0-1.0"
     },
     {
       "name": "Fantasy Orchestra",
       "artist": "Joth",
-      "url": "https://opengameart.org/sites/default/files/FantasyOrchestralTheme_1.mp3",
+      "url": "https://bvs-protocol.vercel.app/rex-relax/music-60/20-fantasy-orchestra-60min.mp3",
       "id": "music-fantasy-orchestra",
-      "type": "music"
+      "type": "music",
+      "sourceUrl": "https://opengameart.org/sites/default/files/FantasyOrchestralTheme_1.mp3",
+      "file": "20-fantasy-orchestra-60min.mp3",
+      "duration": 3600,
+      "edition": "60-minute continuous extended recording",
+      "sourcePage": "https://opengameart.org/content/fantasy-orchestral-theme",
+      "license": "CC0-1.0"
     },
     {
       "id": "guided-breath-body",
@@ -151,7 +271,7 @@ globalThis.REX_AUDIO_V5 = {
       "url": "https://music.wixstatic.com/mp3/bec34c_d8f539d9b12b43dbb3f3d487a9117476.mp3",
       "voice": "bm_george",
       "narrator": "Deep British male",
-      "backgroundCredit": "Gentle Piano — Wolfgang_; Lifewave Piano — The Cynic Project; November Snow — The Cynic Project",
+      "backgroundCredit": "Gentle Piano \u2014 Wolfgang_; Lifewave Piano \u2014 The Cynic Project; November Snow \u2014 The Cynic Project",
       "coverage": {
         "spokenSegments": 79,
         "first": 0,
@@ -177,7 +297,7 @@ globalThis.REX_AUDIO_V5 = {
       "url": "https://music.wixstatic.com/mp3/bec34c_6c2178f9d6e74fd48523f21c7f088b79.mp3",
       "voice": "bm_george",
       "narrator": "Deep British male",
-      "backgroundCredit": "Lifewave Piano — The Cynic Project; Another August — The Cynic Project; November Snow — The Cynic Project",
+      "backgroundCredit": "Lifewave Piano \u2014 The Cynic Project; Another August \u2014 The Cynic Project; November Snow \u2014 The Cynic Project",
       "coverage": {
         "spokenSegments": 80,
         "first": 0,
@@ -203,7 +323,7 @@ globalThis.REX_AUDIO_V5 = {
       "url": "https://music.wixstatic.com/mp3/bec34c_2db20399082646e38d99e4009a382123.mp3",
       "voice": "bm_george",
       "narrator": "Deep British male",
-      "backgroundCredit": "Dream Melody — jkjkke; Another August — The Cynic Project; Gentle Piano — Wolfgang_",
+      "backgroundCredit": "Dream Melody \u2014 jkjkke; Another August \u2014 The Cynic Project; Gentle Piano \u2014 Wolfgang_",
       "coverage": {
         "spokenSegments": 79,
         "first": 0,
@@ -229,7 +349,7 @@ globalThis.REX_AUDIO_V5 = {
       "url": "https://music.wixstatic.com/mp3/bec34c_d8cdd6f3e6b94295b043b66cb92b1985.mp3",
       "voice": "bm_george",
       "narrator": "Deep British male",
-      "backgroundCredit": "November Snow — The Cynic Project; Lifewave Piano — The Cynic Project; Another August — The Cynic Project",
+      "backgroundCredit": "November Snow \u2014 The Cynic Project; Lifewave Piano \u2014 The Cynic Project; Another August \u2014 The Cynic Project",
       "coverage": {
         "spokenSegments": 79,
         "first": 0,
@@ -255,7 +375,7 @@ globalThis.REX_AUDIO_V5 = {
       "url": "https://music.wixstatic.com/mp3/bec34c_725e5057c46e478db6eeb5e1b155d08c.mp3",
       "voice": "bm_george",
       "narrator": "Deep British male",
-      "backgroundCredit": "Another August — The Cynic Project; November Snow — The Cynic Project; Lifewave Piano — The Cynic Project",
+      "backgroundCredit": "Another August \u2014 The Cynic Project; November Snow \u2014 The Cynic Project; Lifewave Piano \u2014 The Cynic Project",
       "coverage": {
         "spokenSegments": 80,
         "first": 0,

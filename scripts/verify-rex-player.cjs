@@ -36,11 +36,27 @@ async function verify(wix){
   doc.getElementById('rxRestart').click();assert.equal(audio.currentTime,0);
   audio.paused=true;audio.currentTime=audio.duration;audio.dispatchEvent(new w.Event('ended'));assert.equal(doc.getElementById('rxPlaybackStatus').textContent,'90-minute guided session complete.');
  }
- grid.children[19].click();audio.dispatchEvent(new w.Event('ended'));await Promise.resolve();assert.equal(audio.src,approved[0].url);
+ for(let i=0;i<20;i++){
+  grid.children[i].click();assert.equal(audio.src,fixture.tracks[i].url);assert.equal(audio.duration,3600);
+  assert.ok(grid.children[i].textContent.includes('60 MIN'));
+  assert.ok(doc.getElementById('rxDescription').textContent.includes('same instrumental composition'));
+  assert.equal(doc.getElementById('rxDownload').href,fixture.tracks[i].url);
+  doc.getElementById('rxPlay').click();await Promise.resolve();assert.equal(audio.paused,false);
+  audio.currentTime=90;doc.getElementById('rxPlay').click();assert.equal(audio.currentTime,90);
+  doc.getElementById('rxPlay').click();await Promise.resolve();assert.equal(audio.currentTime,90);
+  audio.currentTime=3599;doc.getElementById('rxForward').click();assert.equal(audio.currentTime,3600);
+  audio.paused=true;audio.dispatchEvent(new w.Event('ended'));await Promise.resolve();
+  assert.equal(audio.src,fixture.tracks[i].url);assert.equal(audio.paused,true);
+  assert.equal(doc.getElementById('rxPlaybackStatus').textContent,'60-minute music session complete.');
+ }
+ // A stale or accidentally short source must never masquerade as an hour.
+ audio.duration=85;audio.currentTime=0;audio.dispatchEvent(new w.Event('loadedmetadata'));
+ doc.getElementById('rxPlay').click();await Promise.resolve();assert.equal(audio.paused,true);
+ assert.match(doc.getElementById('rxPlaybackStatus').textContent,/could not be verified/);
  audio.dispatchEvent(new w.Event('error'));assert.match(doc.getElementById('rxPlaybackStatus').textContent,/could not load/);
  const v=doc.getElementById(wix?'rrVol':'volume');v.value='0';v.dispatchEvent(new w.Event('input'));assert.equal(audio.volume,0);
  v.value='.55';v.dispatchEvent(new w.Event('input'));assert.equal(audio.volume,.55);
  w.eval(engine);assert.equal(doc.querySelectorAll('#rexRecordedPlayer').length,1);
- dom.window.close();console.log((wix?'Wix':'Therapy Mode')+': 25 tracks, five full-duration selections, play/pause/resume, seeking to the end, restart, playlist advance, errors, volume, and duplicate-load protection passed.');
+ dom.window.close();console.log((wix?'Wix':'Therapy Mode')+': 20 full-hour music selections, five guided sessions, pause/resume, seeking, restart, no automatic track changes, short-file rejection, errors, volume and duplicate-load protection passed.');
 }
 (async()=>{await verify(false);await verify(true)})().catch(e=>{console.error(e);process.exit(1)});

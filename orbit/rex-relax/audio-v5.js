@@ -14,7 +14,7 @@
     base.className = 'box';
     base.id = 'rexRecordedPlayer';
     base.innerHTML = `<h2 style="margin:0 0 8px;font-family:Georgia;color:#f0d696">Music & guided relaxation</h2>
-      <p style="color:#c7c1b3">20 original music tracks + 5 guided sessions, each with a closely guided opening and relaxing music throughout.</p>
+      <p style="color:#c7c1b3">20 continuous 60-minute music sessions + 5 guided 90-minute sessions. Choose one recording for your massage.</p>
       <p id="rxTitle" style="font-size:20px;color:#f0d696"></p>
       <p id="rxDescription" style="color:#aaa79f"></p>
       <audio id="rxRecording" controls playsinline preload="metadata" style="width:100%;display:block" aria-label="Rex Relax audio player"></audio>
@@ -26,18 +26,22 @@
       </div>
       <p id="rxPlaybackStatus" role="status" aria-live="polite" style="color:#d8cfbd;font-size:13px"></p>
       <p id="rxCredit" style="color:#aaa79f;font-size:12px"></p>`;
+    const download=document.createElement('a');
+    download.id='rxDownload';download.textContent='OPEN / SAVE MP3';download.target='_blank';download.rel='noopener';
+    download.style.cssText='color:#f0d696;display:inline-block;padding:12px 0';
+    base.append(download);
     grid.parentNode.insertBefore(base, grid);
     grid.setAttribute('aria-label', 'Music and guided session selection');
     for (const id of ['guidedPlayer', 'rexAudioV4Player', 'rrMusicCredit']) document.getElementById(id)?.remove();
     const status = document.getElementById('audioStatus');
     const controlBox = button.closest('.box');
     const heading = controlBox?.querySelector('h2');
-    if (heading && controlBox !== base) heading.textContent = 'Original music & guided relaxation';
+    if (heading && controlBox !== base) heading.textContent = '60-minute music & guided relaxation';
     const summary = controlBox?.querySelector('p');
-    if (summary && !summary.contains(button)) summary.textContent = 'Choose from 20 original recordings or five different 90-minute guided sessions. Frequent guidance for at least the first 15 minutes, followed by gentle reminders and a gradual return.';
+    if (summary && !summary.contains(button)) summary.textContent = 'Each music recording lasts a full 60 minutes, keeping the same composition and original tempo throughout. Five separate 90-minute guided sessions are also available.';
     if (wix && summary?.contains(button)) {
       const paragraphs = controlBox.querySelectorAll('p');
-      if (paragraphs[0] && !paragraphs[0].contains(button)) paragraphs[0].textContent = '20 original music tracks + 5 guided sessions, each with a closely guided opening and relaxing music throughout.';
+      if (paragraphs[0] && !paragraphs[0].contains(button)) paragraphs[0].textContent = '20 continuous 60-minute music sessions + 5 guided 90-minute sessions. Each selection plays to the end without changing tracks.';
     }
     const old = button, primary = old.cloneNode(true);
     old.replaceWith(primary);
@@ -63,7 +67,19 @@
       const token = generation;
       if (audio.error) audio.load();
       message.textContent = 'Loading audio…';
-      try { await audio.play(); if (token !== generation) return; paint(); }
+      try {
+        if(audio.readyState<1) await new Promise((resolve,reject)=>{
+          const done=()=>{cleanup();resolve()};
+          const fail=()=>{cleanup();reject(new Error('Metadata unavailable'))};
+          const timer=setTimeout(fail,20000);
+          function cleanup(){clearTimeout(timer);audio.removeEventListener('loadedmetadata',done);audio.removeEventListener('error',fail)}
+          audio.addEventListener('loadedmetadata',done);audio.addEventListener('error',fail);
+        });
+        if(token!==generation)return;
+        if(!validDuration()) {message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';return;}
+        if(audio.ended)audio.currentTime=0;
+        await audio.play(); if (token !== generation) return; paint();
+      }
       catch (e) {
         if (token !== generation || e.name === 'AbortError') return;
         message.textContent = e.name === 'NotAllowedError' ? 'Tap PLAY to begin the recording.' : 'Audio could not start. Check your connection and tap PLAY to retry.';
@@ -78,19 +94,20 @@
       const track = tracks[i];
       const timerDuration = document.getElementById('duration') || document.getElementById('rrDur');
       const timerButton = document.getElementById('startBtn') || document.getElementById('rrStart');
-      if (track.type === 'guided' && timerDuration && /^(START|FINISHED)$/.test(timerButton?.textContent.trim())) {
-        timerDuration.value = '90';
+      if (timerDuration && /^(START|FINISHED)$/.test(timerButton?.textContent.trim())) {
+        timerDuration.value = track.type==='guided'?'90':'60';
         timerDuration.dispatchEvent(new Event('change', {bubbles:true}));
       }
       audio.src = track.url;
       audio.load();
-      document.getElementById('rxTitle').textContent = track.name;
+      document.getElementById('rxTitle').textContent = `${track.name} · ${track.type==='music'?'60':'90'} MIN`;
       document.getElementById('rxDescription').textContent = track.type === 'guided'
         ? `${track.method} • 90 minutes. Closely guided for at least the first 15 minutes, with gentle reminders through the closing minutes. A deep British male voice and continuous relaxing music.`
-        : 'Original instrumental recording. The next music track starts automatically when this one ends.';
+        : '60 minutes of the same instrumental composition at its original tempo. Smoothly blended repeats, with a gentle opening and ending. Playback stops when this session finishes.';
       document.getElementById('rxCredit').textContent = track.type === 'guided'
         ? `Original Rex Relax guidance • male AI narration • background: ${track.backgroundCredit}`
-        : `${track.artist} • original recording from the approved collection`;
+        : `${track.artist} • 60-minute extended edition of the credited recording`;
+      download.href=track.url;download.download=track.type==='music'?track.file:'';
       message.textContent = 'Ready. Pause and resume keep your position.';
       paint();
       if (navigator.mediaSession && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({title:track.name,artist:track.type === 'guided'?'Rex Relax':track.artist,album:'Rex Relax'});
@@ -103,7 +120,7 @@
       card.style.cssText = 'text-align:left;min-height:88px;line-height:1.5';
       const title = document.createElement('strong'); title.textContent = `${i + 1}. ${track.name}`;
       const detail = document.createElement('span'); detail.className = 'small';
-      detail.textContent = track.type === 'guided' ? `${track.method} • 90 MIN` : `Original music • ${track.artist}`;
+      detail.textContent = track.type === 'guided' ? `${track.method} • 90 MIN` : `60 MIN • ${track.artist}`;
       card.append(title, document.createElement('br'), detail);
       card.onclick = () => select(i, !audio.paused);
       grid.append(card);
@@ -118,16 +135,21 @@
     document.getElementById('rxRestart').onclick = () => { if (audio.readyState) audio.currentTime = 0; };
     function setVolume() { audio.volume = Math.max(0, Math.min(1, Number(volume.value) || 0)); }
     volume.oninput = setVolume; setVolume();
-    audio.addEventListener('playing', () => { message.textContent = 'Playing'; paint(); wakeScreen(); });
+    audio.addEventListener('playing', () => {
+      if(!validDuration()){audio.pause();message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';return;}
+      message.textContent = 'Playing'; paint(); wakeScreen();
+    });
     audio.addEventListener('pause', () => { message.textContent = `Paused at ${clock(audio.currentTime)}. PLAY continues from here.`; paint(); releaseWake(); });
     audio.addEventListener('waiting', () => { message.textContent = 'Buffering audio — playback resumes when the connection catches up.'; });
     audio.addEventListener('error', () => { message.textContent = 'This recording could not load. Check your connection and tap PLAY to retry.'; paint(); releaseWake(); });
     audio.addEventListener('ended', () => {
-      if (tracks[selected].type === 'music') select((selected + 1) % 20, true);
-      else { message.textContent = '90-minute guided session complete.'; paint(); releaseWake(); }
+      message.textContent = tracks[selected].type==='music'?'60-minute music session complete.':'90-minute guided session complete.';
+      paint(); releaseWake();
     });
+    function validDuration(){return Number.isFinite(audio.duration)&&Math.abs(audio.duration-tracks[selected].duration)<1}
     audio.addEventListener('loadedmetadata', () => {
-      if (tracks[selected].type === 'guided' && Math.abs(audio.duration - 5400) > 2) message.textContent = 'Recording duration could not be confirmed as 90 minutes. Please choose another session.';
+      if(!validDuration()){audio.pause();message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';}
+      else if(audio.paused)message.textContent=`Ready · ${clock(audio.duration)}. Press PLAY.`;
     });
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !audio.paused) wakeScreen(); });
     if (navigator.mediaSession) {

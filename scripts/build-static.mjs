@@ -16,4 +16,5 @@ fs.copyFileSync(workerPath,'orbit/service-worker.js');
 fs.copyFileSync(workerPath,'orbit/serviceWorker.js');
 
 await import('./verify-rex-release.mjs');
+await import('./build-rex-music.mjs');
 console.log('Unified BVS entry built. Approved UI and canonical app storage unchanged.');

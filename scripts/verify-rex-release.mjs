@@ -5,13 +5,15 @@ const base='orbit/rex-relax/';
 const context={};vm.createContext(context);
 vm.runInContext(fs.readFileSync(base+'audio-v5-data.js','utf8'),context);
 const data=context.REX_AUDIO_V5;
-assert.equal(data.release,'2026.09.13.7');
+assert.equal(data.release,'2026.09.13.8');
 const music=data.tracks.filter(t=>t.type==='music'),guided=data.tracks.filter(t=>t.type==='guided');
 const approved=JSON.parse(fs.readFileSync('scripts/rex-approved-music.json','utf8'));
 assert.equal(music.length,20);assert.equal(guided.length,5);
 for(let i=0;i<20;i++){
   assert.equal(music[i].name,approved[i].name);
-  assert.equal(music[i].url,approved[i].url);
+  assert.equal(music[i].sourceUrl,approved[i].url);
+  assert.equal(music[i].duration,3600);
+  assert.ok(music[i].url.endsWith("-60min.mp3"));
 }
 for(const track of guided){
   assert.equal(track.voice,'bm_george');
@@ -61,4 +63,4 @@ assert.ok(publicEmbed.includes('Cash preferred. Direct debit also accepted.'));
 assert.ok(!publicEmbed.toLowerCase().includes('calendly'));
 assert.equal((publicEmbed.match(/https:\/\/wa.me\/447957229022/g)||[]).length,5);
 assert.ok(!fs.readFileSync(base+'sw.js','utf8').includes('INJECT'));
-console.log('Rex Relax release verified: original 20 tracks, five recorded 90-minute sessions, five distinct openings with frequent guidance for at least 15 minutes, guidance through minute 89, prices, oil questions, and client database preserved.');
+console.log('Rex Relax release verified: 20 complete 60-minute extended tracks, five recorded 90-minute sessions, five distinct openings with frequent guidance for at least 15 minutes, guidance through minute 89, prices, oil questions, and client database preserved.');

@@ -2,7 +2,7 @@
   "$schema":"https://openapi.vercel.sh/vercel.json",
   "framework":null,
   "buildCommand":"node scripts/build-static.mjs",
-  "installCommand":"",
+  "installCommand":"npm ci --omit=dev",
   "outputDirectory":"orbit",
   "redirects":[
     {"source":"/","has":[{"type":"host","value":"bvsprotocol.com"}],"destination":"https://bvs-protocol.vercel.app/live.html","permanent":false},
