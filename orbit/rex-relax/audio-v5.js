@@ -48,7 +48,7 @@
     const audio = document.getElementById('rxRecording');
     const playButton = document.getElementById('rxPlay');
     const message = document.getElementById('rxPlaybackStatus');
-    let selected = 0, generation = 0, wake = null;
+    let selected = 0, generation = 0, wake = null, metadataVerified = false;
     const clock = n => `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(Math.floor(n % 60)).padStart(2, '0')}`;
     async function wakeScreen() {
       try { if (!wake && navigator.wakeLock && document.visibilityState === 'visible') wake = await navigator.wakeLock.request('screen'); } catch (_) {}
@@ -65,7 +65,7 @@
     }
     async function play() {
       const token = generation;
-      if (audio.error) audio.load();
+      if (audio.error || audio.ended) { metadataVerified=false; audio.load(); }
       message.textContent = 'Loading audio…';
       try {
         if(audio.readyState<1) await new Promise((resolve,reject)=>{
@@ -76,7 +76,7 @@
           audio.addEventListener('loadedmetadata',done);audio.addEventListener('error',fail);
         });
         if(token!==generation)return;
-        if(!validDuration()) {message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';return;}
+        if(!metadataVerified) {message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';return;}
         if(audio.ended)audio.currentTime=0;
         await audio.play(); if (token !== generation) return; paint();
       }
@@ -90,6 +90,7 @@
     function select(i, autoplay = false) {
       generation++;
       audio.pause();
+      metadataVerified = false;
       selected = i;
       const track = tracks[i];
       const timerDuration = document.getElementById('duration') || document.getElementById('rrDur');
@@ -136,7 +137,7 @@
     function setVolume() { audio.volume = Math.max(0, Math.min(1, Number(volume.value) || 0)); }
     volume.oninput = setVolume; setVolume();
     audio.addEventListener('playing', () => {
-      if(!validDuration()){audio.pause();message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';return;}
+      if(!metadataVerified){audio.pause();message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';return;}
       message.textContent = 'Playing'; paint(); wakeScreen();
     });
     audio.addEventListener('pause', () => { message.textContent = `Paused at ${clock(audio.currentTime)}. PLAY continues from here.`; paint(); releaseWake(); });
@@ -148,7 +149,10 @@
     });
     function validDuration(){return Number.isFinite(audio.duration)&&Math.abs(audio.duration-tracks[selected].duration)<1}
     audio.addEventListener('loadedmetadata', () => {
-      if(!validDuration()){audio.pause();message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';}
+      // Validate the file when it loads. Chrome may revise an MP3 duration
+      // estimate after seeking; this must not invalidate a verified source.
+      metadataVerified=validDuration();
+      if(!metadataVerified){audio.pause();message.textContent='The full recording could not be verified. Please reload the page; playback has been stopped.';}
       else if(audio.paused)message.textContent=`Ready · ${clock(audio.duration)}. Press PLAY.`;
     });
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !audio.paused) wakeScreen(); });

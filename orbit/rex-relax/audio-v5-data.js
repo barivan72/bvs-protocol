@@ -1,6 +1,6 @@
 /* 20 full-hour extended recordings and five preserved guided sessions. */
 globalThis.REX_AUDIO_V5 = {
-  "release": "2026.09.13.8",
+  "release": "2026.09.13.9",
   "tracks": [
     {
       "name": "Acoustic Revelation",

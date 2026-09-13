@@ -8,11 +8,11 @@ async function verify(wix){
  const html=wix?'<div id="rrTM"><button id="rrClose">EXIT</button><div class="box"><h2>Massage soundscapes</h2><p>Old description</p><p><button id="rrAudio">START MUSIC</button><input id="rrVol" value=".55"></p><div id="rrSounds"></div></div></div>':fs.readFileSync('orbit/rex-relax/index.html','utf8');
  const dom=new JSDOM(html,{runScripts:'outside-only',url:'https://example.test/rex-relax/'});
  const w=dom.window;w.REX_AUDIO_V5=fixture;
- const state=new WeakMap();const stateFor=e=>{if(!state.has(e))state.set(e,{paused:true,currentTime:0,error:null,duration:180});return state.get(e)};
+ const state=new WeakMap();const stateFor=e=>{if(!state.has(e))state.set(e,{paused:true,ended:false,currentTime:0,error:null,duration:180});return state.get(e)};
  const proto=w.HTMLMediaElement.prototype;
- for(const k of ['paused','currentTime','error','duration'])Object.defineProperty(proto,k,{configurable:true,get(){return stateFor(this)[k]},set(v){stateFor(this)[k]=v}});
+ for(const k of ['paused','ended','currentTime','error','duration'])Object.defineProperty(proto,k,{configurable:true,get(){return stateFor(this)[k]},set(v){stateFor(this)[k]=v}});
  Object.defineProperty(proto,'readyState',{get(){return 1}});
- proto.load=function(){this.currentTime=0;this.error=null;this.duration=fixture.tracks.find(t=>t.url===this.src)?.duration||180;this.dispatchEvent(new w.Event('loadedmetadata'))};
+ proto.load=function(){this.currentTime=0;this.ended=false;this.error=null;this.duration=fixture.tracks.find(t=>t.url===this.src)?.duration||180;this.dispatchEvent(new w.Event('loadedmetadata'))};
  proto.play=async function(){this.paused=false;this.dispatchEvent(new w.Event('playing'))};
  proto.pause=function(){this.paused=true;this.dispatchEvent(new w.Event('pause'))};
  w.eval(engine);
@@ -45,9 +45,14 @@ async function verify(wix){
   audio.currentTime=90;doc.getElementById('rxPlay').click();assert.equal(audio.currentTime,90);
   doc.getElementById('rxPlay').click();await Promise.resolve();assert.equal(audio.currentTime,90);
   audio.currentTime=3599;doc.getElementById('rxForward').click();assert.equal(audio.currentTime,3600);
-  audio.paused=true;audio.dispatchEvent(new w.Event('ended'));await Promise.resolve();
+  audio.paused=true;audio.ended=true;audio.dispatchEvent(new w.Event('ended'));await Promise.resolve();
   assert.equal(audio.src,fixture.tracks[i].url);assert.equal(audio.paused,true);
   assert.equal(doc.getElementById('rxPlaybackStatus').textContent,'60-minute music session complete.');
+  audio.duration=3606;doc.getElementById('rxPlay').click();await Promise.resolve();
+  assert.equal(audio.paused,false);assert.equal(audio.currentTime,0);assert.equal(audio.duration,3600);
+  audio.currentTime=1800;audio.duration=3606;audio.paused=true;
+  doc.getElementById('rxPlay').click();await Promise.resolve();assert.equal(audio.paused,false);assert.equal(audio.currentTime,1800);
+  audio.pause();
  }
  // A stale or accidentally short source must never masquerade as an hour.
  audio.duration=85;audio.currentTime=0;audio.dispatchEvent(new w.Event('loadedmetadata'));

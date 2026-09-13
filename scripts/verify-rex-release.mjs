@@ -5,7 +5,7 @@ const base='orbit/rex-relax/';
 const context={};vm.createContext(context);
 vm.runInContext(fs.readFileSync(base+'audio-v5-data.js','utf8'),context);
 const data=context.REX_AUDIO_V5;
-assert.equal(data.release,'2026.09.13.8');
+assert.equal(data.release,'2026.09.13.9');
 const music=data.tracks.filter(t=>t.type==='music'),guided=data.tracks.filter(t=>t.type==='guided');
 const approved=JSON.parse(fs.readFileSync('scripts/rex-approved-music.json','utf8'));
 assert.equal(music.length,20);assert.equal(guided.length,5);
