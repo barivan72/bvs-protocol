@@ -15,8 +15,6 @@ fs.writeFileSync(workerPath,"// BVS_ORIGIN_DISPATCH_6\nif(['bvsprotocol.com','ww
 fs.copyFileSync(workerPath,'orbit/service-worker.js');
 fs.copyFileSync(workerPath,'orbit/serviceWorker.js');
 
-// Rex Relax Audio v4: strict release guard. This is intentionally independent
-// of the previous experimental audio layer so regressions cannot silently publish.
 const dataPath='orbit/rex-relax/audio-v4-data.js';
 const enginePath='orbit/rex-relax/audio-v4.js';
 const rexSwPath='orbit/rex-relax/sw.js';
@@ -46,10 +44,13 @@ new vm.Script(engine,{filename:enginePath});
 for(const id of ['rxPlay','rxBack','rxForward','rxRestart','rxSeek','rxVoicePreview','rxRepeat'])if(!engine.includes(`id="${id}"`))throw new Error('Rex Relax v4 transport control missing: '+id);
 for(const fn of ['scheduleMusic','playPad','playPluck','playBell','checkGuidance','repeatGuidance','loadVoices'])if(!engine.includes('function '+fn+'('))throw new Error('Rex Relax v4 function missing: '+fn);
 if(!engine.includes('15 complete massage-music compositions + 5 guided relaxation sessions'))throw new Error('Rex Relax v4 UI summary missing');
+if(!engine.includes('harmony, melody, pads and gentle instrumental movement'))throw new Error('Rex Relax musical arrangement layer missing');
 const sw=fs.readFileSync(rexSwPath,'utf8');
+new vm.Script(sw,{filename:rexSwPath});
 for(const asset of ['audio-v4-data.js','audio-v4.js'])if(!sw.includes(asset))throw new Error('Rex Relax service worker does not load '+asset);
-if(!sw.includes('REX_AUDIO_V4_INJECT'))throw new Error('Rex Relax service worker injection guard missing');
-console.log('Rex Relax AUDIO V4 CHECK 1/2 PASSED: 15 musical compositions + 5 guided, all 60 min; 16 cues per guided; max guidance gap <=4 min; transport and voice controls present.');
+if(!sw.includes('REX_AUDIO_V4_INJECT')||!sw.includes("u.searchParams.set('rv4','1')"))throw new Error('Rex Relax service worker activation/injection guard missing');
+console.log('Rex Relax AUDIO V4 CHECK 1/2 PASSED: 15 musical compositions + 5 guided, all 60 min; 16 cues per guided; max guidance gap <=4 min; transport and voice controls present; player/SW syntax valid.');
 for(const t of guided){let delivered=0,last=-1;for(let second=0;second<=3600;second++){while(delivered<t.cues.length&&t.cues[delivered].at<=second){last=t.cues[delivered].at;delivered++;}}if(delivered!==t.cues.length||last<3480)throw new Error('Rex Relax timeline simulation failed: '+t.id);}
-console.log('Rex Relax AUDIO V4 CHECK 2/2 PASSED: full-hour guidance timeline simulation delivered every scheduled cue.');
+const exactCueTotal=guided.reduce((n,t)=>n+t.cues.length,0);if(exactCueTotal!==80)throw new Error('Expected exactly 80 guided cue events across five sessions');
+console.log('Rex Relax AUDIO V4 CHECK 2/2 PASSED: simulated every second of all five 60-minute sessions and delivered all 80 spoken cue events through minute 58.');
 console.log('Unified BVS entry built. Approved UI and canonical app storage unchanged.');
