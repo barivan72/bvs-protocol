@@ -5,7 +5,7 @@ const base='orbit/rex-relax/';
 const context={};vm.createContext(context);
 vm.runInContext(fs.readFileSync(base+'audio-v5-data.js','utf8'),context);
 const data=context.REX_AUDIO_V5;
-assert.equal(data.release,'2026.09.13.5');
+assert.equal(data.release,'2026.09.13.6');
 const music=data.tracks.filter(t=>t.type==='music'),guided=data.tracks.filter(t=>t.type==='guided');
 const approved=JSON.parse(fs.readFileSync('scripts/rex-approved-music.json','utf8'));
 assert.equal(music.length,20);assert.equal(guided.length,5);
@@ -14,6 +14,8 @@ for(let i=0;i<20;i++){
   assert.equal(music[i].url,approved[i].url);
 }
 for(const track of guided){
+  assert.equal(track.voice,'bm_george');
+  assert.equal(track.narrator,'Deep British male');
   assert.equal(track.duration,5400);
   assert.match(track.url,/^https:\/\//);
   assert.ok(track.backgroundCredit);
@@ -37,5 +39,11 @@ assert.ok(html.includes("const DB='RexRelaxClientMemory',STORE='clients'"));
 assert.ok(!engine.includes('SpeechSynthesisUtterance'));
 assert.ok(!engine.includes('createOscillator'));
 assert.ok(engine.includes('<audio'));
+assert.ok(engine.includes('male AI narration'));
+const publicEmbed=fs.readFileSync('scripts/rex-public-site-embed.html','utf8');
+assert.ok(publicEmbed.includes('Completely free.'));
+assert.ok(publicEmbed.includes('Cash preferred. Direct debit also accepted.'));
+assert.ok(!publicEmbed.toLowerCase().includes('calendly'));
+assert.equal((publicEmbed.match(/https:\/\/wa.me\/447957229022/g)||[]).length,5);
 assert.ok(!fs.readFileSync(base+'sw.js','utf8').includes('INJECT'));
 console.log('Rex Relax release verified: original 20 tracks, five recorded 90-minute sessions, guidance through minute 89, prices, oil questions, and client database preserved.');

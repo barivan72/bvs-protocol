@@ -1,56 +1,180 @@
 {
-  "release": "2026.09.13.5",
-  "verification": "Complete MP3 decoding, duration, comparison of all 46 spoken segments against the source voice clips, and background music between every spoken segment.",
+  "release": "2026.09.13.6",
+  "verification": "Complete decoding of five MP3s; comparison of all 230 male spoken passages against their source clips; background music checked between and within narration passages.",
+  "narration": {
+    "voice": "bm_george",
+    "engine": "Kokoro-82M v1.0",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/hexgrad/Kokoro-82M",
+    "accent": "British English",
+    "pitchSemitones": -2,
+    "generatedLocally": true,
+    "paidSubscriptionRequired": false
+  },
   "sessions": [
     {
-      "file": "guided-breath-body-90min.mp3",
+      "file": "guided-breath-body-male-90min.mp3",
       "durationSeconds": 5400.048,
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "decodedCompletely": true,
       "spokenSegmentsVerified": 46,
-      "minimumVoiceCorrelation": 0.9849,
+      "minimumVoiceCorrelation": 0.9844,
       "backgroundGapsVerified": 46,
-      "minimumBackgroundRMS": 0.0402,
-      "closingGuidanceAt": 5350
+      "minimumBackgroundRMS": 0.03714,
+      "minimumMusicInVoicePausesRMS": 0.01371,
+      "closingGuidanceAt": 5350,
+      "sha256": "cdfdbfe8dfb2c3b3a271a5b23fc6359f3daf3e2c011aedac3a0f470b924662c4"
     },
     {
-      "file": "guided-nervous-system-90min.mp3",
+      "file": "guided-nervous-system-male-90min.mp3",
       "durationSeconds": 5400.048,
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "decodedCompletely": true,
       "spokenSegmentsVerified": 46,
-      "minimumVoiceCorrelation": 0.9816,
+      "minimumVoiceCorrelation": 0.98,
       "backgroundGapsVerified": 46,
-      "minimumBackgroundRMS": 0.03592,
-      "closingGuidanceAt": 5350
+      "minimumBackgroundRMS": 0.0335,
+      "minimumMusicInVoicePausesRMS": 0.01119,
+      "closingGuidanceAt": 5350,
+      "sha256": "387a986e6e9ddc619dac9a529d466c7fb50bcf546fad9bab826f4525174f4109"
     },
     {
-      "file": "guided-muscle-release-90min.mp3",
+      "file": "guided-muscle-release-male-90min.mp3",
       "durationSeconds": 5400.048,
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "decodedCompletely": true,
       "spokenSegmentsVerified": 46,
-      "minimumVoiceCorrelation": 0.9861,
+      "minimumVoiceCorrelation": 0.9834,
       "backgroundGapsVerified": 46,
-      "minimumBackgroundRMS": 0.04019,
-      "closingGuidanceAt": 5350
+      "minimumBackgroundRMS": 0.03966,
+      "minimumMusicInVoicePausesRMS": 0.01736,
+      "closingGuidanceAt": 5350,
+      "sha256": "5e95e9cb3b82f31a8d91edaf4446c8d30a0da98cd6b2ac3ca795c3f0742a19e3"
     },
     {
-      "file": "guided-mindful-recovery-90min.mp3",
+      "file": "guided-mindful-recovery-male-90min.mp3",
       "durationSeconds": 5400.048,
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "decodedCompletely": true,
       "spokenSegmentsVerified": 46,
-      "minimumVoiceCorrelation": 0.9824,
+      "minimumVoiceCorrelation": 0.9801,
       "backgroundGapsVerified": 46,
-      "minimumBackgroundRMS": 0.03539,
-      "closingGuidanceAt": 5350
+      "minimumBackgroundRMS": 0.03635,
+      "minimumMusicInVoicePausesRMS": 0.00894,
+      "closingGuidanceAt": 5350,
+      "sha256": "2920ae924b2377483fed7cbbd234ccea14b124032e64404ecb442f01f252c7ea"
     },
     {
-      "file": "guided-deep-rest-90min.mp3",
+      "file": "guided-deep-rest-male-90min.mp3",
       "durationSeconds": 5400.048,
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "decodedCompletely": true,
       "spokenSegmentsVerified": 46,
-      "minimumVoiceCorrelation": 0.9833,
+      "minimumVoiceCorrelation": 0.9799,
       "backgroundGapsVerified": 46,
-      "minimumBackgroundRMS": 0.03742,
-      "closingGuidanceAt": 5350
+      "minimumBackgroundRMS": 0.03673,
+      "minimumMusicInVoicePausesRMS": 0.00785,
+      "closingGuidanceAt": 5350,
+      "sha256": "186ddd9eeabbab681f1aab413eda7461bb2159511b4195a0dbceca87dd297e95"
     }
-  ]
+  ],
+  "sourceParagraphsVerified": 82,
+  "hostedDeliveryChecks": [
+    {
+      "file": "guided-breath-body-male-90min.mp3",
+      "position": "start",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-breath-body-male-90min.mp3",
+      "position": "middle",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-breath-body-male-90min.mp3",
+      "position": "end",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-nervous-system-male-90min.mp3",
+      "position": "start",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-nervous-system-male-90min.mp3",
+      "position": "middle",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-nervous-system-male-90min.mp3",
+      "position": "end",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-muscle-release-male-90min.mp3",
+      "position": "start",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-muscle-release-male-90min.mp3",
+      "position": "middle",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-muscle-release-male-90min.mp3",
+      "position": "end",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-mindful-recovery-male-90min.mp3",
+      "position": "start",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-mindful-recovery-male-90min.mp3",
+      "position": "middle",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-mindful-recovery-male-90min.mp3",
+      "position": "end",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-deep-rest-male-90min.mp3",
+      "position": "start",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-deep-rest-male-90min.mp3",
+      "position": "middle",
+      "status": 206,
+      "bytes": 4096
+    },
+    {
+      "file": "guided-deep-rest-male-90min.mp3",
+      "position": "end",
+      "status": 206,
+      "bytes": 4096
+    }
+  ],
+  "browserPlaybackLimitation": "Audio playback in the cloud test browser was blocked by the environment; complete local decoding and hosted byte-range delivery were verified separately."
 }

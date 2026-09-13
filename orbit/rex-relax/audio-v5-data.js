@@ -1,6 +1,6 @@
-/* Original Rex Relax recordings and complete, verified guided sessions. */
+/* Original music and complete guided sessions with deep male narration. */
 globalThis.REX_AUDIO_V5 = {
-  "release": "2026.09.13.5",
+  "release": "2026.09.13.6",
   "tracks": [
     {
       "name": "Acoustic Revelation",
@@ -147,7 +147,9 @@ globalThis.REX_AUDIO_V5 = {
       "name": "Breath & Body",
       "type": "guided",
       "duration": 5400,
-      "url": "https://music.wixstatic.com/mp3/bec34c_4561fafe9a464b8a8035592567167c31.mp3",
+      "url": "https://music.wixstatic.com/mp3/bec34c_17c9bd108c3b49129697dbcf5823be8f.mp3",
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "backgroundCredit": "Gentle Piano — Wolfgang_",
       "coverage": {
         "spokenSegments": 46,
@@ -155,14 +157,16 @@ globalThis.REX_AUDIO_V5 = {
         "last": 5350,
         "maxGap": 120
       },
-      "sha256": "34b816ca1fec887040a7bab2cb3f1d99e582b6f625766374e93c33a3683b70e8"
+      "sha256": "cdfdbfe8dfb2c3b3a271a5b23fc6359f3daf3e2c011aedac3a0f470b924662c4"
     },
     {
       "id": "guided-nervous-system",
       "name": "Quiet Mind",
       "type": "guided",
       "duration": 5400,
-      "url": "https://music.wixstatic.com/mp3/bec34c_f1e97fed9afd40d0817d6c7690ad86ed.mp3",
+      "url": "https://music.wixstatic.com/mp3/bec34c_19da2263f15b49268090c4dcb39e374e.mp3",
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "backgroundCredit": "Lifewave Piano — The Cynic Project",
       "coverage": {
         "spokenSegments": 46,
@@ -170,14 +174,16 @@ globalThis.REX_AUDIO_V5 = {
         "last": 5350,
         "maxGap": 120
       },
-      "sha256": "dd6fcd35fee492e36346a7bd9f1acbe71585582ef4357e2f3957351ee2e1046c"
+      "sha256": "387a986e6e9ddc619dac9a529d466c7fb50bcf546fad9bab826f4525174f4109"
     },
     {
       "id": "guided-muscle-release",
       "name": "Full Body Release",
       "type": "guided",
       "duration": 5400,
-      "url": "https://music.wixstatic.com/mp3/bec34c_82083408ac484fcca8425b4663ea4df4.mp3",
+      "url": "https://music.wixstatic.com/mp3/bec34c_4eece3b3e1a34793adf0ffb4f6b252d1.mp3",
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "backgroundCredit": "Dream Melody — jkjkke",
       "coverage": {
         "spokenSegments": 46,
@@ -185,14 +191,16 @@ globalThis.REX_AUDIO_V5 = {
         "last": 5350,
         "maxGap": 120
       },
-      "sha256": "2214c183899c7c37ee2b065a7a5f93c0237d608c637e36e6a2cfb8f30dab2a64"
+      "sha256": "5e95e9cb3b82f31a8d91edaf4446c8d30a0da98cd6b2ac3ca795c3f0742a19e3"
     },
     {
       "id": "guided-mindful-recovery",
       "name": "Mindful Recovery",
       "type": "guided",
       "duration": 5400,
-      "url": "https://music.wixstatic.com/mp3/bec34c_c9138c8797a341fbab698470abd09c06.mp3",
+      "url": "https://music.wixstatic.com/mp3/bec34c_f8e996b244d54b3b91eb188aa7eac5f9.mp3",
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "backgroundCredit": "November Snow — The Cynic Project",
       "coverage": {
         "spokenSegments": 46,
@@ -200,14 +208,16 @@ globalThis.REX_AUDIO_V5 = {
         "last": 5350,
         "maxGap": 120
       },
-      "sha256": "e554eefaf7d2dda9e8695dd800c2ed1ea917ce05c5514bc5abf8afb571d7469b"
+      "sha256": "2920ae924b2377483fed7cbbd234ccea14b124032e64404ecb442f01f252c7ea"
     },
     {
       "id": "guided-deep-rest",
       "name": "Deep Rest",
       "type": "guided",
       "duration": 5400,
-      "url": "https://music.wixstatic.com/mp3/bec34c_ac96f0819d69473582f636d6235b6b7b.mp3",
+      "url": "https://music.wixstatic.com/mp3/bec34c_f55b4e3d4b6f464e85ba82531b1d9144.mp3",
+      "voice": "bm_george",
+      "narrator": "Deep British male",
       "backgroundCredit": "Another August — The Cynic Project",
       "coverage": {
         "spokenSegments": 46,
@@ -215,7 +225,7 @@ globalThis.REX_AUDIO_V5 = {
         "last": 5350,
         "maxGap": 120
       },
-      "sha256": "c108f1842052796adfee4ca0a014d6906c4622da369a5cfcd24bcb9bd1a1939c"
+      "sha256": "186ddd9eeabbab681f1aab413eda7461bb2159511b4195a0dbceca87dd297e95"
     }
   ]
 };
