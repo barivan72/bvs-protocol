@@ -14,7 +14,7 @@
     base.className = 'box';
     base.id = 'rexRecordedPlayer';
     base.innerHTML = `<h2 style="margin:0 0 8px;font-family:Georgia;color:#f0d696">Music & guided relaxation</h2>
-      <p style="color:#c7c1b3">20 original music tracks + 5 complete 90-minute guided sessions with a deep male voice.</p>
+      <p style="color:#c7c1b3">20 original music tracks + 5 guided sessions, each with a closely guided opening and relaxing music throughout.</p>
       <p id="rxTitle" style="font-size:20px;color:#f0d696"></p>
       <p id="rxDescription" style="color:#aaa79f"></p>
       <audio id="rxRecording" controls playsinline preload="metadata" style="width:100%;display:block" aria-label="Rex Relax audio player"></audio>
@@ -34,10 +34,10 @@
     const heading = controlBox?.querySelector('h2');
     if (heading && controlBox !== base) heading.textContent = 'Original music & guided relaxation';
     const summary = controlBox?.querySelector('p');
-    if (summary && !summary.contains(button)) summary.textContent = 'Choose from the 20 original recordings or five complete guided sessions with a deep male voice and relaxing music throughout all 90 minutes.';
+    if (summary && !summary.contains(button)) summary.textContent = 'Choose from 20 original recordings or five different 90-minute guided sessions. Frequent guidance for at least the first 15 minutes, followed by gentle reminders and a gradual return.';
     if (wix && summary?.contains(button)) {
       const paragraphs = controlBox.querySelectorAll('p');
-      if (paragraphs[0] && !paragraphs[0].contains(button)) paragraphs[0].textContent = '20 original music tracks + 5 complete 90-minute guided sessions with a deep male voice.';
+      if (paragraphs[0] && !paragraphs[0].contains(button)) paragraphs[0].textContent = '20 original music tracks + 5 guided sessions, each with a closely guided opening and relaxing music throughout.';
     }
     const old = button, primary = old.cloneNode(true);
     old.replaceWith(primary);
@@ -86,7 +86,7 @@
       audio.load();
       document.getElementById('rxTitle').textContent = track.name;
       document.getElementById('rxDescription').textContent = track.type === 'guided'
-        ? '90 minutes • deep male voice with a British accent and continuous relaxing music. Spoken guidance returns throughout, including the closing minutes.'
+        ? `${track.method} • 90 minutes. Closely guided for at least the first 15 minutes, with gentle reminders through the closing minutes. A deep British male voice and continuous relaxing music.`
         : 'Original instrumental recording. The next music track starts automatically when this one ends.';
       document.getElementById('rxCredit').textContent = track.type === 'guided'
         ? `Original Rex Relax guidance • male AI narration • background: ${track.backgroundCredit}`
@@ -103,7 +103,7 @@
       card.style.cssText = 'text-align:left;min-height:88px;line-height:1.5';
       const title = document.createElement('strong'); title.textContent = `${i + 1}. ${track.name}`;
       const detail = document.createElement('span'); detail.className = 'small';
-      detail.textContent = track.type === 'guided' ? 'Deep male voice + relaxing music • 90 MIN' : `Original music • ${track.artist}`;
+      detail.textContent = track.type === 'guided' ? `${track.method} • 90 MIN` : `Original music • ${track.artist}`;
       card.append(title, document.createElement('br'), detail);
       card.onclick = () => select(i, !audio.paused);
       grid.append(card);

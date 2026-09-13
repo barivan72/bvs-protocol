@@ -23,6 +23,9 @@ async function verify(wix){
  const audio=doc.getElementById('rxRecording');
  for(let i=20;i<25;i++){
   grid.children[i].click();assert.equal(audio.src,fixture.tracks[i].url);assert.equal(audio.duration,5400);
+  assert.ok(grid.children[i].textContent.includes(fixture.tracks[i].method));
+  assert.ok(doc.getElementById('rxDescription').textContent.includes('first 15 minutes'));
+  assert.ok(doc.getElementById('rxDescription').textContent.includes(fixture.tracks[i].method));
   if(!wix)assert.equal(doc.getElementById('duration').value,'90');
   doc.getElementById('rxPlay').click();await Promise.resolve();assert.equal(audio.paused,false);
   audio.currentTime=2712;doc.getElementById('rxPlay').click();assert.equal(audio.paused,true);assert.equal(audio.currentTime,2712);

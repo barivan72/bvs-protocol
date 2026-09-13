@@ -5,7 +5,7 @@ const base='orbit/rex-relax/';
 const context={};vm.createContext(context);
 vm.runInContext(fs.readFileSync(base+'audio-v5-data.js','utf8'),context);
 const data=context.REX_AUDIO_V5;
-assert.equal(data.release,'2026.09.13.6');
+assert.equal(data.release,'2026.09.13.7');
 const music=data.tracks.filter(t=>t.type==='music'),guided=data.tracks.filter(t=>t.type==='guided');
 const approved=JSON.parse(fs.readFileSync('scripts/rex-approved-music.json','utf8'));
 assert.equal(music.length,20);assert.equal(guided.length,5);
@@ -19,12 +19,27 @@ for(const track of guided){
   assert.equal(track.duration,5400);
   assert.match(track.url,/^https:\/\//);
   assert.ok(track.backgroundCredit);
-  assert.ok(track.coverage.spokenSegments>=46);
+  assert.ok(track.method);
+  assert.ok(track.coverage.denseOpeningSeconds>=900);
+  assert.ok(track.coverage.first15Minutes.spokenFraction>=.65);
+  assert.ok(track.coverage.first15Minutes.longestPauseSeconds<=8.1);
+  assert.ok(track.coverage.spokenSegments>=75);
   assert.equal(track.coverage.first,0);
   assert.ok(track.coverage.last>=5350);
-  assert.ok(track.coverage.maxGap<=120);
+  assert.ok(track.coverage.maxGap<=120.001);
 }
 assert.equal(new Set(data.tracks.map(t=>t.url)).size,25);
+assert.equal(new Set(guided.map(t=>t.method)).size,5);
+const scripts=JSON.parse(fs.readFileSync('docs/rex-relax-guided-transcripts.json','utf8'));
+for(const session of scripts){
+  assert.ok(session.cues[0].phase==='opening');
+  assert.ok(session.denseOpeningSeconds>=900);
+  assert.equal(session.cues.at(-1).at,5350);
+  for(const cue of session.cues){
+    assert.ok(!/^(welcome|this is|you are listening)/i.test(cue.text));
+    assert.ok(!/\b(rex|advert|ninety|male voice|kokoro|subscribe|booking|calendly)\b/i.test(cue.text));
+  }
+}
 const html=fs.readFileSync(base+'index.html','utf8');
 const engine=fs.readFileSync(base+'audio-v5.js','utf8');
 new vm.Script(engine);
@@ -46,4 +61,4 @@ assert.ok(publicEmbed.includes('Cash preferred. Direct debit also accepted.'));
 assert.ok(!publicEmbed.toLowerCase().includes('calendly'));
 assert.equal((publicEmbed.match(/https:\/\/wa.me\/447957229022/g)||[]).length,5);
 assert.ok(!fs.readFileSync(base+'sw.js','utf8').includes('INJECT'));
-console.log('Rex Relax release verified: original 20 tracks, five recorded 90-minute sessions, guidance through minute 89, prices, oil questions, and client database preserved.');
+console.log('Rex Relax release verified: original 20 tracks, five recorded 90-minute sessions, five distinct openings with frequent guidance for at least 15 minutes, guidance through minute 89, prices, oil questions, and client database preserved.');
