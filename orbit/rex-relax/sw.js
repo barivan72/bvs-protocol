@@ -1,7 +1,7 @@
 const CACHE='rex-relax-2026-09-13-4';
 const RELEASE='2026.09.13.4';
 const ASSETS=['/rex-relax/index.html','/rex-relax/manifest.webmanifest','/rex-relax/icon.svg','/rex-relax/audio-v4-data.js','/rex-relax/audio-v4.js'];
-const INJECT='<!-- REX_AUDIO_V4_INJECT '+RELEASE+' --><script src="/rex-relax/audio-v4-data.js?v=20260913-4"></script><script src="/rex-relax/audio-v4.js?v=20260913-4"></script>';
+const INJECT='<!-- REX_AUDIO_V4_INJECT '+RELEASE+' --><script src="/rex-relax/audio-v4-data.js?v=20260913-4"></script><script src="/rex-relax/audio-v4.js?v=20260913-4"></script><script>document.querySelector(".version")&&(document.querySelector(".version").textContent="Rex Relax Therapy Mode • v2026.09.13.4")</script>';
 function inject(html){if(html.includes('REX_AUDIO_V4_INJECT'))return html;return html.includes('</body>')?html.replace('</body>',INJECT+'</body>'):html+INJECT;}
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{
