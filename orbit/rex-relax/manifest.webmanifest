@@ -8,5 +8,5 @@
   "background_color":"#070806",
   "theme_color":"#090909",
   "description":"Private Rex Relax therapist tool for session timing, client records, consent and voice notes.",
-  "icons":[{"src":"/rex-relax/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "icons":[{"src":"/rex-relax/icon.svg?v=20260915-1","sizes":"any","type":"image/svg+xml","purpose":"any"}]
 }
