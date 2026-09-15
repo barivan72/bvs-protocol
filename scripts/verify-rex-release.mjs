@@ -43,7 +43,9 @@ for(const session of scripts){
   }
 }
 const html=fs.readFileSync(base+'index.html','utf8');
-const engine=fs.readFileSync(base+'audio-v5.js','utf8');
+const loader=fs.readFileSync(base+'audio-v5.js','utf8');
+const engine=fs.readFileSync(base+'audio-v5-core.js','utf8');
+new vm.Script(loader);
 new vm.Script(engine);
 for(const script of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(script[1]);
 assert.ok(!html.includes('speechSynthesis'));
@@ -57,6 +59,8 @@ assert.ok(!engine.includes('SpeechSynthesisUtterance'));
 assert.ok(!engine.includes('createOscillator'));
 assert.ok(engine.includes('<audio'));
 assert.ok(engine.includes('male AI narration'));
+assert.ok(loader.includes('icon.svg?v=20260915-1'));
+assert.ok(loader.includes('audio-v5-core.js?v=20260915-1'));
 const publicEmbed=fs.readFileSync('scripts/rex-public-site-embed.html','utf8');
 assert.ok(publicEmbed.includes('Completely free.'));
 assert.ok(publicEmbed.includes('Cash preferred. Direct debit also accepted.'));
