@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import struct
 import sys
 import time
@@ -11,8 +10,11 @@ import urllib.request
 from pathlib import Path
 
 UA = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36"
-PET_RELEASE = "20260916-1"
+PET_RELEASE = "20260916-2"
 PET_LOGO_SHA = "7b39d400d307a28ff90cd9a3b6495fc3e4dfe6dcb8497a8db3d243701408c649"
+PET_APPROVED_APP_LOGO_SHA = "8ea56a80fee28b495fb986261475d00b765d283291c1df6f5b25ae0df1b35503"
+PET_ICON_512_SHA = "8ea56a80fee28b495fb986261475d00b765d283291c1df6f5b25ae0df1b35503"
+PET_MASKABLE_SHA = "3d853992c558389cf8e75f1a7bd70d1416843059570ce3dc60a14161d099aa4e"
 REX_LOGO_SHA = "5c9a2928fabef55fa8eefd2967aebd3499c60a55e66047ff448fe2e7a1462244"
 FREEZE_MANIFEST = Path("/tmp/rex-relax-freeze-hashes.json")
 
@@ -65,17 +67,25 @@ def verify_pet(root: str) -> None:
     html = fetch(base + "index.html").decode("utf-8", "replace")
     manifest = json.loads(fetch(base + "manifest.webmanifest").decode("utf-8"))
     worker = fetch(base + "sw.js").decode("utf-8")
-    logo = fetch(base + "pt-logo-strip.png")
+    site_logo = fetch(base + "pt-logo-strip.png")
+    approved_logo = fetch(base + "pet-tomorrow-logo.png")
     icon192 = fetch(base + "icon-192.png")
     icon512 = fetch(base + "icon-512.png")
     maskable = fetch(base + "icon-512-maskable.png")
     apple = fetch(base + "apple-touch-icon.png")
+    favicon32 = fetch(base + "favicon-32.png")
+    favicon48 = fetch(base + "favicon-48.png")
 
-    assert sha(logo) == PET_LOGO_SHA
+    assert sha(site_logo) == PET_LOGO_SHA
+    assert sha(approved_logo) == PET_APPROVED_APP_LOGO_SHA
+    assert sha(icon512) == PET_ICON_512_SHA
+    assert sha(maskable) == PET_MASKABLE_SHA
     assert png_size(icon192) == (192, 192)
     assert png_size(icon512) == (512, 512)
     assert png_size(maskable) == (512, 512)
     assert png_size(apple) == (180, 180)
+    assert png_size(favicon32) == (32, 32)
+    assert png_size(favicon48) == (48, 48)
     assert manifest["name"] == "Pet Tomorrow"
     assert manifest["display"] == "standalone"
     assert manifest["scope"] == "./" and manifest["id"] == "./"
@@ -86,6 +96,8 @@ def verify_pet(root: str) -> None:
     assert "data:image/svg+xml" not in html
     assert f"pet-tomorrow-pwa-{PET_RELEASE}" in html
     assert f"pet-tomorrow-pwa-{PET_RELEASE}" in worker
+    assert f"icon-512.png?v={PET_RELEASE}" in html
+    assert f"manifest.webmanifest?v={PET_RELEASE}" in html
 
 
 def main() -> None:
@@ -96,7 +108,7 @@ def main() -> None:
     for pass_no in (1, 2, 3):
         verify_rex(root, frozen)
         verify_pet(root)
-        print("PUBLIC_PASS", pass_no, "REX_RELAX_BYTE_IDENTICAL", "PET_TOMORROW_PWA_OK", root + "pet-tomorrow/")
+        print("PUBLIC_PASS", pass_no, "REX_RELAX_BYTE_IDENTICAL", "PET_TOMORROW_APPROVED_ICON_AND_PWA_OK", root + "pet-tomorrow/")
         time.sleep(1)
 
 
