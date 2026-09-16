@@ -10,7 +10,7 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - name: Snapshot current Pet Tomorrow production
         run: |
@@ -36,6 +36,11 @@ jobs:
           assert hashlib.sha256(logo).hexdigest()=='7b39d400d307a28ff90cd9a3b6495fc3e4dfe6dcb8497a8db3d243701408c649'
           print('LIVE_PET_TOMORROW_OK')
           PY
+
+      - name: Install icon renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
 
       - name: Build standalone PWA package
         run: |
