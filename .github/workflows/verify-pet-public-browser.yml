@@ -1,0 +1,75 @@
+name: Verify public Pet Tomorrow PWA installability
+on:
+  push:
+    branches: ["pet-tomorrow-pwa-fix"]
+    paths:
+      - ".github/workflows/verify-pet-public-browser.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Install Chrome probe dependency
+        run: npm install --no-save chrome-remote-interface
+
+      - name: Triple-check public Pet Tomorrow PWA in clean Chrome profiles
+        run: |
+          set -euo pipefail
+          URL='https://barivan72.github.io/bvs-protocol/pet-tomorrow/?source=install&release=20260916-1'
+          for PASS in 1 2 3; do
+            rm -rf "/tmp/pet-chrome-$PASS"
+            google-chrome --headless=new --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir="/tmp/pet-chrome-$PASS" "$URL" >/tmp/pet-chrome.log 2>&1 &
+            CHROME_PID=$!
+            trap 'kill $CHROME_PID 2>/dev/null || true' EXIT
+            for i in $(seq 1 40); do
+              if curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1; then break; fi
+              sleep 0.5
+            done
+            if ! curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
+              cat /tmp/pet-chrome.log || true
+              exit 1
+            fi
+            PASS="$PASS" node <<'NODE'
+          const CDP=require('chrome-remote-interface');
+          (async()=>{
+            const pass=Number(process.env.PASS);
+            const targets=await CDP.List({host:'127.0.0.1',port:9222});
+            const target=targets.find(t=>t.type==='page' && t.url.includes('/pet-tomorrow/')) || targets.find(t=>t.type==='page');
+            if(!target) throw new Error('No Pet Tomorrow page target');
+            const client=await CDP({target,host:'127.0.0.1',port:9222});
+            const {Page,Runtime}=client;
+            await Page.enable();
+            await new Promise(r=>setTimeout(r,2500));
+            const installability=await Page.getInstallabilityErrors();
+            const manifestResult=await Page.getAppManifest();
+            const state=await Runtime.evaluate({expression:`(async()=>{
+              const reg=await navigator.serviceWorker.ready;
+              const m=document.querySelector('link[rel="manifest"]');
+              return {
+                title:document.title,
+                url:location.href,
+                manifest:m&&m.href,
+                serviceWorkerScope:reg&&reg.scope,
+                icons:[...document.querySelectorAll('link[rel~="icon"],link[rel="apple-touch-icon"]')].map(x=>x.href),
+                obsoletePaw:document.documentElement.innerHTML.includes('data:image/svg+xml')
+              };
+            })()`,awaitPromise:true,returnByValue:true});
+            const info={pass,installabilityErrors:installability.installabilityErrors,manifestUrl:manifestResult.url,state:state.result.value};
+            console.log(JSON.stringify(info));
+            if(installability.installabilityErrors.length) throw new Error('Chrome installability errors: '+JSON.stringify(installability.installabilityErrors));
+            if(!manifestResult.url || !manifestResult.url.includes('/pet-tomorrow/manifest.webmanifest')) throw new Error('Wrong Pet Tomorrow manifest URL');
+            if(!state.result.value?.serviceWorkerScope?.endsWith('/pet-tomorrow/')) throw new Error('Wrong or missing Pet Tomorrow service worker scope');
+            if(!state.result.value?.icons?.some(u=>u.includes('/pet-tomorrow/icon-192.png'))) throw new Error('Missing Pet Tomorrow 192 icon');
+            if(!state.result.value?.icons?.some(u=>u.includes('/pet-tomorrow/icon-512.png'))) throw new Error('Missing Pet Tomorrow 512 icon');
+            if(state.result.value?.obsoletePaw) throw new Error('Old paw data icon still present');
+            await client.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+            kill "$CHROME_PID" 2>/dev/null || true
+            wait "$CHROME_PID" 2>/dev/null || true
+            trap - EXIT
+          done
+          echo PET_TOMORROW_PUBLIC_INSTALLABILITY_3X_OK
