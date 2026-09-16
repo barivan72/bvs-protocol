@@ -20,10 +20,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install existing build dependency
+        run: npm ci --omit=dev
 
       - name: Prepare BVS redirect and standalone Rex Relax PWA
         run: |
@@ -51,19 +54,9 @@ jobs:
           cp orbit/rex-relax/logo.jpg _site/rex-relax/logo.jpg
           cp orbit/rex-relax/icon.svg _site/rex-relax/icon.svg
 
-          if command -v magick >/dev/null 2>&1; then
-            magick _site/rex-relax/logo.jpg -resize 192x192! _site/rex-relax/icon-192.png
-            magick _site/rex-relax/logo.jpg -resize 512x512! _site/rex-relax/icon-512.png
-          elif command -v convert >/dev/null 2>&1; then
-            convert _site/rex-relax/logo.jpg -resize 192x192! _site/rex-relax/icon-192.png
-            convert _site/rex-relax/logo.jpg -resize 512x512! _site/rex-relax/icon-512.png
-          elif command -v ffmpeg >/dev/null 2>&1; then
-            ffmpeg -loglevel error -y -i _site/rex-relax/logo.jpg -vf scale=192:192 _site/rex-relax/icon-192.png
-            ffmpeg -loglevel error -y -i _site/rex-relax/logo.jpg -vf scale=512:512 _site/rex-relax/icon-512.png
-          else
-            echo 'No image scaler is available on the runner.' >&2
-            exit 1
-          fi
+          FFMPEG="$(node -e "process.stdout.write(require('ffmpeg-static'))")"
+          "$FFMPEG" -loglevel error -y -i _site/rex-relax/logo.jpg -vf scale=192:192 -frames:v 1 -update 1 _site/rex-relax/icon-192.png
+          "$FFMPEG" -loglevel error -y -i _site/rex-relax/logo.jpg -vf scale=512:512 -frames:v 1 -update 1 _site/rex-relax/icon-512.png
 
           python3 - <<'PY'
           from pathlib import Path
