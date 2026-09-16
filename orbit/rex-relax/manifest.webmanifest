@@ -12,28 +12,16 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "https://static.wixstatic.com/media/bec34c_a7d6ab9b5f8347f8bc4b572bb84ffae5~mv2.png",
+      "src": "./logo.jpg?v=20260916-5",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg?v=20260916-5",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "https://static.wixstatic.com/media/bec34c_a7671e7c66294f6ca18527bb3eb2c2cd~mv2.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://static.wixstatic.com/media/bec34c_699ad4835b4243d48c2cea37c88b63bc~mv2.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "https://static.wixstatic.com/media/bec34c_10818bbf67894e28a9f62e9f348dcbae~mv2.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }
