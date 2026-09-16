@@ -1,7 +1,7 @@
 /* Rex Relax: final branding + standalone PWA install + recorded audio loader. */
 (() => {
   'use strict';
-  const icon = './logo.jpg?v=20260916-6';
+  const icon = '/rex-relax/icon-512.png?v=20260916-7';
 
   function applyBrand() {
     const mark = document.querySelector('.mark');
