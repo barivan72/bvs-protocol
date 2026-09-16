@@ -12,13 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Resolve Netlify deploy host only
+      - name: Verify pettomorrow.com production PWA
         shell: bash
         run: |
           set -u
-          echo '=== netlify-mcp A ==='
-          dig +short netlify-mcp.netlify.app A || true
-          echo '=== netlify-mcp AAAA ==='
-          dig +short netlify-mcp.netlify.app AAAA || true
-          echo '=== current Pet Tomorrow host ==='
-          dig +short pettomorrow.com A || true
+          echo '=== HOME HEADERS ==='
+          curl -fsSIL --max-time 20 https://pettomorrow.com/ || true
+          echo '=== HOME PWA MARKERS ==='
+          curl -fsSL --max-time 20 https://pettomorrow.com/ | grep -Eio 'manifest[^" ]*|icon-192[^" ]*|icon-512[^" ]*|apple-touch-icon[^" ]*|data:image/svg\+xml|Pet Tomorrow' | head -80 || true
+          echo '=== MANIFEST ==='
+          curl -fsSL --max-time 20 https://pettomorrow.com/manifest.webmanifest || true
+          echo
+          echo '=== ICON 512 HEADERS ==='
+          curl -fsSIL --max-time 20 https://pettomorrow.com/icon-512.png || true
+          echo '=== SERVICE WORKER ==='
+          curl -fsSL --max-time 20 https://pettomorrow.com/sw.js | head -c 3000 || true
+          echo
