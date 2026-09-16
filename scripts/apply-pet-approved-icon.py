@@ -8,13 +8,14 @@ import re
 import time
 import urllib.request
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageDraw
 
-RELEASE = "20260916-2"
-SOURCE_URL = "https://pettomorrow.com/icons/pt-app-icon-v3-512.png"
-APPROVED_SOURCE_SHA256 = "8ea56a80fee28b495fb986261475d00b765d283291c1df6f5b25ae0df1b35503"
+RELEASE = "20260916-4"
+HERO_URL = "https://pettomorrow.com/pt-hero-pets.png"
+STRIP_URL = "https://pettomorrow.com/pt-logo-strip.png"
+STRIP_SHA256 = "7b39d400d307a28ff90cd9a3b6495fc3e4dfe6dcb8497a8db3d243701408c649"
 OUT = Path("_site/pet-tomorrow")
-THEME = "#149f91"
+THEME = "#0aa89a"
 UA = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36"
 
 
@@ -26,34 +27,59 @@ def sha_file(path: Path) -> str:
     return sha_bytes(path.read_bytes())
 
 
-def fetch_approved_icon() -> bytes:
+def fetch(url: str) -> bytes:
+    sep = "&" if "?" in url else "?"
     req = urllib.request.Request(
-        f"{SOURCE_URL}?verify={time.time()}",
+        f"{url}{sep}verify={time.time()}",
         headers={"User-Agent": UA, "Cache-Control": "no-cache, no-store"},
     )
     with urllib.request.urlopen(req, timeout=30) as response:
         data = response.read()
-        assert response.status == 200, f"HTTP {response.status}: {SOURCE_URL}"
-    assert data[:8] == b"\x89PNG\r\n\x1a\n", "Approved Pet Tomorrow app icon is not PNG"
-    actual = sha_bytes(data)
-    assert actual == APPROVED_SOURCE_SHA256, f"Approved Pet Tomorrow app icon drifted: {actual}"
-    return data
+        assert response.status == 200, f"HTTP {response.status}: {url}"
+        return data
 
 
 def save_png(image: Image.Image, path: Path) -> None:
     image.save(path, format="PNG", optimize=True)
 
 
-def build_icons(source_bytes: bytes) -> dict[str, str]:
+def synthesize_logo(hero_bytes: bytes, strip_bytes: bytes) -> Image.Image:
+    hero = Image.open(io.BytesIO(hero_bytes)).convert("RGB")
+    strip = Image.open(io.BytesIO(strip_bytes)).convert("RGBA")
+    assert hero.width > hero.height >= 400
+    assert strip.width >= 250 and strip.height >= 70
+
+    size = 1024
+    canvas = Image.new("RGB", (size, size), THEME)
+    draw = ImageDraw.Draw(canvas)
+    draw.ellipse((36, 36, 988, 988), fill="white")
+
+    # Use the live Golden Retriever + cat artwork, tightly cropped around the pets.
+    crop_size = hero.height
+    left = min(max(0, int(hero.width * 0.12)), hero.width - crop_size)
+    pets = hero.crop((left, 0, left + crop_size, crop_size)).resize((860, 860), Image.Resampling.LANCZOS)
+    mask = Image.new("L", (860, 860), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, 860, 860), fill=255)
+    canvas.paste(pets, (82, 70), mask)
+
+    # White brand panel and the existing PetTomorrow wordmark/tagline, without the old paw-only favicon.
+    draw.rounded_rectangle((56, 660, 968, 986), radius=82, fill="white")
+    text_crop = strip.crop((max(105, int(strip.width * 0.33)), 0, strip.width, strip.height))
+    target_w = 780
+    target_h = int(text_crop.height * target_w / text_crop.width)
+    text_crop = text_crop.resize((target_w, target_h), Image.Resampling.LANCZOS)
+    canvas.paste(text_crop, ((size - target_w) // 2, 700), text_crop)
+    return canvas
+
+
+def build_icons(hero_bytes: bytes, strip_bytes: bytes) -> dict[str, str]:
     OUT.mkdir(parents=True, exist_ok=True)
-    source = Image.open(io.BytesIO(source_bytes)).convert("RGB")
-    assert source.size == (512, 512), f"Unexpected approved logo size: {source.size}"
+    source = synthesize_logo(hero_bytes, strip_bytes)
     resample = Image.Resampling.LANCZOS
 
-    # Preserve the approved Golden Retriever + cat + Pet Tomorrow artwork as-is
-    # for Android/Chrome's primary 512px icon and for a human-auditable copy.
-    (OUT / "pet-tomorrow-logo.png").write_bytes(source_bytes)
-    (OUT / "icon-512.png").write_bytes(source_bytes)
+    save_png(source, OUT / "app-icon-1024.png")
+    save_png(source.resize((512, 512), resample), OUT / "pet-tomorrow-logo.png")
+    save_png(source.resize((512, 512), resample), OUT / "icon-512.png")
     save_png(source.resize((192, 192), resample), OUT / "icon-192.png")
     save_png(source.resize((180, 180), resample), OUT / "apple-touch-icon.png")
     save_png(source.resize((48, 48), resample), OUT / "favicon-48.png")
@@ -62,17 +88,16 @@ def build_icons(source_bytes: bytes) -> dict[str, str]:
         OUT / "favicon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)]
     )
 
-    # Adaptive launchers crop maskable icons. Keep the full approved badge inside
-    # the safe zone, on the same teal field as the approved artwork.
     maskable = Image.new("RGB", (512, 512), THEME)
     safe = source.resize((404, 404), resample)
     maskable.paste(safe, ((512 - 404) // 2, (512 - 404) // 2))
     save_png(maskable, OUT / "icon-512-maskable.png")
 
-    return {
+    hashes = {
         name: sha_file(OUT / name)
         for name in [
             "pet-tomorrow-logo.png",
+            "app-icon-1024.png",
             "icon-192.png",
             "icon-512.png",
             "icon-512-maskable.png",
@@ -82,14 +107,13 @@ def build_icons(source_bytes: bytes) -> dict[str, str]:
             "favicon.ico",
         ]
     }
+    (OUT / "icon-sha256.txt").write_text(hashes["icon-512.png"] + "\n", encoding="utf-8")
+    return hashes
 
 
 def patch_html() -> None:
     path = OUT / "index.html"
     html = path.read_text(encoding="utf-8")
-
-    # Remove all previous favicon/manifest declarations so the old paw cannot
-    # win by link order in Chrome or Samsung's launcher.
     html = re.sub(
         r'<link\b[^>]*\brel=["\'][^"\']*(?:icon|manifest)[^"\']*["\'][^>]*>\s*',
         "",
@@ -102,7 +126,6 @@ def patch_html() -> None:
         html,
         flags=re.I,
     )
-
     links = "\n".join(
         [
             f'<link rel="manifest" href="./manifest.webmanifest?v={RELEASE}">',
@@ -120,7 +143,12 @@ def patch_html() -> None:
         ]
     )
     html = html.replace("</head>", links + "\n</head>", 1)
-    html = html.replace("20260916-1", RELEASE)
+    # Register the new standalone worker last; it takes ownership of the Pet Tomorrow scope.
+    html = html.replace(
+        "</body>",
+        "<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(console.warn));}</script></body>",
+        1,
+    )
     assert "data:image/svg+xml" not in html
     path.write_text(html, encoding="utf-8")
 
@@ -154,6 +182,8 @@ def write_worker() -> None:
         "./",
         "./index.html",
         "./manifest.webmanifest",
+        "./pt-logo-strip.png",
+        "./pt-hero-pets.png",
         "./pet-tomorrow-logo.png",
         "./icon-192.png",
         "./icon-512.png",
@@ -181,15 +211,21 @@ def verify(icon_hashes: dict[str, str]) -> None:
     assert manifest["display"] == "standalone"
     assert manifest["id"] == "./" and manifest["scope"] == "./"
     assert any(i.get("purpose") == "maskable" for i in manifest["icons"])
-    assert sha_file(OUT / "pet-tomorrow-logo.png") == APPROVED_SOURCE_SHA256
-    assert sha_file(OUT / "icon-512.png") == APPROVED_SOURCE_SHA256
-    print("PET_TOMORROW_APPROVED_GOLDEN_RETRIEVER_CAT_ICON_OK")
+    assert icon_hashes["icon-512.png"] == (OUT / "icon-sha256.txt").read_text().strip()
+    assert sha_file(OUT / "pt-logo-strip.png") == STRIP_SHA256
+    print("PET_TOMORROW_GOLDEN_RETRIEVER_CAT_LOGO_AND_PWA_OK")
     print(json.dumps(icon_hashes, indent=2, sort_keys=True))
 
 
 def main() -> None:
-    source_bytes = fetch_approved_icon()
-    hashes = build_icons(source_bytes)
+    hero_bytes = fetch(HERO_URL)
+    strip_bytes = fetch(STRIP_URL)
+    assert hero_bytes[:8] == b"\x89PNG\r\n\x1a\n"
+    assert strip_bytes[:8] == b"\x89PNG\r\n\x1a\n"
+    assert sha_bytes(strip_bytes) == STRIP_SHA256
+    (OUT / "pt-hero-pets.png").write_bytes(hero_bytes)
+    (OUT / "pt-logo-strip.png").write_bytes(strip_bytes)
+    hashes = build_icons(hero_bytes, strip_bytes)
     patch_html()
     write_manifest()
     write_worker()
