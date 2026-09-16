@@ -1,0 +1,5 @@
+const CACHE='pet-tomorrow-pwa-20260916-4';
+const ASSETS=["./","./index.html","./manifest.webmanifest","./pt-logo-strip.png","./pt-hero-pets.png","./pet-tomorrow-logo.png","./icon-192.png","./icon-512.png","./icon-512-maskable.png","./apple-touch-icon.png","./favicon-32.png","./favicon-48.png","./favicon.ico"];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();for(const k of await caches.keys())if(k.startsWith('pet-tomorrow-pwa-')&&k!==CACHE)await caches.delete(k);})()));
+self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin)return;e.respondWith(fetch(e.request,{cache:'no-cache'}).then(r=>{if(r.ok)caches.open(CACHE).then(c=>c.put(e.request,r.clone()));return r;}).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('./index.html'):null)||new Response('Unavailable offline',{status:503})));});
