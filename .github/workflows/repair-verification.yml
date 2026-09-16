@@ -2,7 +2,7 @@ name: BVS fault-tolerant update verification
 on:
   push:
     branches: [main, repair/mobile-update5]
-    paths: ['orbit/**','scripts/**','vercel.json','.github/workflows/repair-verification.yml']
+    paths: ['orbit/**','scripts/**','vercel.json','package.json','package-lock.json','.github/workflows/repair-verification.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,11 +12,13 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Install build dependencies
+        run: npm ci --omit=dev
       - name: Build portable static application
         run: |
           mkdir -p verification
