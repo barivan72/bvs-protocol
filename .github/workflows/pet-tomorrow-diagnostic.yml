@@ -12,14 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Inspect Pet Tomorrow live assets only
+      - name: Resolve Netlify deploy host only
         shell: bash
         run: |
           set -u
-          for u in \
-            https://pettomorrow.com/pt-logo-strip.png \
-            https://pettomorrow.com/pt-hero-pets.png \
-            https://pettomorrow.com/; do
-            echo "=== $u ==="
-            curl -fsSIL --max-time 20 "$u" || true
-          done
+          echo '=== netlify-mcp A ==='
+          dig +short netlify-mcp.netlify.app A || true
+          echo '=== netlify-mcp AAAA ==='
+          dig +short netlify-mcp.netlify.app AAAA || true
+          echo '=== current Pet Tomorrow host ==='
+          dig +short pettomorrow.com A || true
