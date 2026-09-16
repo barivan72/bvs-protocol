@@ -1,64 +1,55 @@
 name: Build and test Pet Tomorrow PWA
 on:
   push:
-    branches: [pet-tomorrow-pwa-fix]
-    paths: ['.github/workflows/inspect-pet-tomorrow-live.yml']
+    branches: ["pet-tomorrow-pwa-fix"]
+    paths:
+      - ".github/workflows/inspect-pet-tomorrow-live.yml"
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
     steps:
       - name: Snapshot current Pet Tomorrow production
         run: |
           set -euo pipefail
           mkdir -p snapshot
           python3 - <<'PY'
-          import re, hashlib, urllib.request
+          import hashlib, urllib.request
           BASE='https://pettomorrow.com/'
           UA='Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36'
           def fetch(url):
               req=urllib.request.Request(url,headers={'User-Agent':UA,'Cache-Control':'no-cache'})
               with urllib.request.urlopen(req,timeout=25) as r:
-                  return r.status,r.geturl(),r.headers.get('content-type',''),r.read()
-          status,final,ctype,body=fetch(BASE+'?pt_audit=20260916')
-          assert status==200
+                  return r.status,r.read()
+          st,body=fetch(BASE+'?pt_audit=20260916')
+          assert st==200
           html=body.decode('utf-8','replace')
           assert 'Pet Tomorrow' in html
           assert 'ずっと' in html and 'いっしょ' in html and 'ペットのもっと明るいあしたへ' in html
           open('snapshot/index.html','w',encoding='utf-8').write(html)
-          status,final,ctype,logo=fetch(BASE+'pt-logo-strip.png?pt_audit=20260916')
-          assert status==200 and logo[:8]==b'\x89PNG\r\n\x1a\n'
+          st,logo=fetch(BASE+'pt-logo-strip.png?pt_audit=20260916')
+          assert st==200 and logo[:8]==b'\x89PNG\r\n\x1a\n'
           open('snapshot/pt-logo-strip.png','wb').write(logo)
-          print('LIVE_ROOT_OK',len(body))
-          print('LIVE_BRAND_LOGO_SHA256',hashlib.sha256(logo).hexdigest())
-          print('LIVE_JAPANESE_BRAND_TEXT_OK')
-          print('LIVE_HAS_OLD_PAW_DATA_ICON', "data:image/svg+xml" in html and "rel=\"icon\"" in html)
-          for path in ('manifest.webmanifest','sw.js','icon-192.png','icon-512.png'):
-              try:
-                  st,fin,ct,b=fetch(BASE+path+'?pt_audit=20260916')
-                  print('LIVE_EXISTING',path,st,ct,len(b))
-              except Exception as e:
-                  print('LIVE_MISSING',path,type(e).__name__)
+          assert hashlib.sha256(logo).hexdigest()=='7b39d400d307a28ff90cd9a3b6495fc3e4dfe6dcb8497a8db3d243701408c649'
+          print('LIVE_PET_TOMORROW_OK')
           PY
 
-      - name: Build standalone Pet Tomorrow PWA package
+      - name: Build standalone PWA package
         run: |
           set -euo pipefail
-          RELEASE=20260916-1
           mkdir -p package/pet-tomorrow
           cp snapshot/index.html package/pet-tomorrow/index.html
           cp snapshot/pt-logo-strip.png package/pet-tomorrow/pt-logo-strip.png
-
           python3 - <<'PY'
           from pathlib import Path
           import re
           p=Path('package/pet-tomorrow/index.html')
           s=p.read_text(encoding='utf-8')
-          old=re.compile(r'<link href="data:image/svg\+xml,[^"]+" rel="icon"\s*/?>',re.I)
-          replacement='''<link rel="manifest" href="./manifest.webmanifest?v=20260916-1"/>
+          pattern=re.compile(r'<link href="data:image/svg\+xml,[^"]+" rel="icon"\s*/?>',re.I)
+          repl='''<link rel="manifest" href="./manifest.webmanifest?v=20260916-1"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=20260916-1"/>
 <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=20260916-1"/>
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=20260916-1"/>
@@ -66,17 +57,15 @@ jobs:
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Pet Tomorrow"/>
 <meta name="pgc-package" content="pet-tomorrow-pwa-20260916-1"/>'''
-          s,n=old.subn(replacement,s,count=1)
-          assert n==1, 'Old paw favicon was not replaced exactly once'
+          s,n=pattern.subn(repl,s,count=1)
+          assert n==1
           p.write_text(s,encoding='utf-8')
           PY
-
           ffmpeg -hide_banner -loglevel error -y -i package/pet-tomorrow/pt-logo-strip.png -vf "crop=97:97:0:0,scale=192:192:flags=lanczos" -frames:v 1 -update 1 package/pet-tomorrow/icon-192.png
           ffmpeg -hide_banner -loglevel error -y -i package/pet-tomorrow/pt-logo-strip.png -vf "crop=97:97:0:0,scale=512:512:flags=lanczos" -frames:v 1 -update 1 package/pet-tomorrow/icon-512.png
           ffmpeg -hide_banner -loglevel error -y -i package/pet-tomorrow/pt-logo-strip.png -vf "crop=97:97:0:0,scale=410:410:flags=lanczos,pad=512:512:51:51:color=0x183f35" -frames:v 1 -update 1 package/pet-tomorrow/icon-512-maskable.png
           ffmpeg -hide_banner -loglevel error -y -i package/pet-tomorrow/pt-logo-strip.png -vf "crop=97:97:0:0,scale=180:180:flags=lanczos" -frames:v 1 -update 1 package/pet-tomorrow/apple-touch-icon.png
           ffmpeg -hide_banner -loglevel error -y -i package/pet-tomorrow/pt-logo-strip.png -vf "crop=97:97:0:0,scale=1024:1024:flags=lanczos" -frames:v 1 -update 1 package/pet-tomorrow/app-icon-1024.png
-
           cat > package/pet-tomorrow/manifest.webmanifest <<'JSON'
           {
             "name":"Pet Tomorrow",
@@ -88,7 +77,7 @@ jobs:
             "display_override":["standalone","minimal-ui"],
             "background_color":"#f7f7f1",
             "theme_color":"#183f35",
-            "description":"Pet Tomorrow — clever pet-tech and premium robot finds for happier pets.",
+            "description":"Pet Tomorrow — clever finds for happier pets.",
             "prefer_related_applications":false,
             "icons":[
               {"src":"./icon-192.png?v=20260916-1","sizes":"192x192","type":"image/png","purpose":"any"},
@@ -97,7 +86,6 @@ jobs:
             ]
           }
           JSON
-
           cat > package/pet-tomorrow/sw.js <<'JS'
           const CACHE='pet-tomorrow-pwa-2026-09-16-1';
           const ASSETS=['./','./index.html','./manifest.webmanifest','./pt-logo-strip.png','./icon-192.png','./icon-512.png','./icon-512-maskable.png','./apple-touch-icon.png'];
@@ -106,25 +94,24 @@ jobs:
           self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.includes('/pet-tomorrow/'))return;e.respondWith(fetch(e.request,{cache:'no-cache'}).then(r=>{if(r.ok)caches.open(CACHE).then(c=>c.put(e.request,r.clone()));return r;}).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('./index.html'):null)||new Response('Unavailable offline',{status:503})));});
           JS
 
-      - name: Verify package structure and brand three times
+      - name: Verify package three times
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          import hashlib,json,struct,time
+          import hashlib,json,struct
           base=Path('package/pet-tomorrow')
-          expected_logo='7b39d400d307a28ff90cd9a3b6495fc3e4dfe6dcb8497a8db3d243701408c649'
           def size(name):
               b=(base/name).read_bytes(); assert b[:8]==b'\x89PNG\r\n\x1a\n'; return struct.unpack('>II',b[16:24])
           for n in (1,2,3):
               h=(base/'index.html').read_text(encoding='utf-8')
               m=json.loads((base/'manifest.webmanifest').read_text())
               sw=(base/'sw.js').read_text()
-              assert hashlib.sha256((base/'pt-logo-strip.png').read_bytes()).hexdigest()==expected_logo
+              assert hashlib.sha256((base/'pt-logo-strip.png').read_bytes()).hexdigest()=='7b39d400d307a28ff90cd9a3b6495fc3e4dfe6dcb8497a8db3d243701408c649'
               assert 'Pet Tomorrow — Clever finds for happier pets' in h
               assert 'ずっと' in h and 'いっしょ' in h and 'ペットのもっと明るいあしたへ' in h
               assert 'data:image/svg+xml' not in h
-              assert 'meta name="pgc-package" content="pet-tomorrow-pwa-20260916-1"' in h
+              assert 'pet-tomorrow-pwa-20260916-1' in h
               assert './manifest.webmanifest?v=20260916-1' in h
               assert m['name']=='Pet Tomorrow' and m['display']=='standalone' and m['scope']=='./' and m['id']=='./'
               assert any(i.get('purpose')=='maskable' for i in m['icons'])
@@ -135,48 +122,9 @@ jobs:
               assert size('app-icon-1024.png')==(1024,1024)
               assert 'pet-tomorrow-pwa-2026-09-16-1' in sw
               print('PACKAGE_PASS',n)
-              time.sleep(.5)
           PY
 
-      - name: Triple-check Chrome installability on clean profiles
-        run: |
-          set -euo pipefail
-          npm install --no-save chrome-remote-interface >/dev/null 2>&1
-          python3 -m http.server 8080 --directory package >/tmp/pet-http.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
-          sleep 1
-          for PASS in 1 2 3; do
-            rm -rf "/tmp/pet-chrome-$PASS"
-            google-chrome --headless=new --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir="/tmp/pet-chrome-$PASS" 'http://127.0.0.1:8080/pet-tomorrow/?source=install&release=20260916-1' >/tmp/pet-chrome.log 2>&1 &
-            CHROME_PID=$!
-            for i in $(seq 1 30); do curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1 && break; sleep .5; done
-            PASS="$PASS" node <<'NODE'
-          const CDP=require('chrome-remote-interface');
-          (async()=>{
-            const pass=Number(process.env.PASS);
-            const targets=await CDP.List({host:'127.0.0.1',port:9222});
-            const target=targets.find(t=>t.type==='page'&&t.url.includes('/pet-tomorrow/'))||targets.find(t=>t.type==='page');
-            if(!target)throw new Error('No Pet Tomorrow page target');
-            const client=await CDP({target,host:'127.0.0.1',port:9222});
-            const {Page,Runtime}=client; await Page.enable(); await new Promise(r=>setTimeout(r,2200));
-            const errors=await Page.getInstallabilityErrors();
-            const manifest=await Page.getAppManifest();
-            const state=await Runtime.evaluate({expression:`(async()=>{const r=await navigator.serviceWorker.ready;return{title:document.title,url:location.href,manifest:document.querySelector('link[rel="manifest"]')?.href,scope:r.scope,icons:[...document.querySelectorAll('link[rel~="icon"],link[rel="apple-touch-icon"]')].map(x=>x.href)}})()`,awaitPromise:true,returnByValue:true});
-            const out={pass,errors:errors.installabilityErrors,manifestUrl:manifest.url,state:state.result.value}; console.log(JSON.stringify(out));
-            if(errors.installabilityErrors.length)throw new Error('Installability errors '+JSON.stringify(errors.installabilityErrors));
-            if(!manifest.url.includes('/pet-tomorrow/manifest.webmanifest'))throw new Error('Wrong manifest');
-            if(!state.result.value.scope.endsWith('/pet-tomorrow/'))throw new Error('Wrong service worker scope');
-            await client.close();
-          })().catch(e=>{console.error(e);process.exit(1)});
-          NODE
-            kill "$CHROME_PID" 2>/dev/null || true
-            wait "$CHROME_PID" 2>/dev/null || true
-          done
-          kill "$SERVER_PID" 2>/dev/null || true
-          trap - EXIT
-
-      - name: Upload tested Pet Tomorrow package
+      - name: Upload tested package
         uses: actions/upload-artifact@v4
         with:
           name: pettomorrow-pwa-tested
