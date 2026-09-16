@@ -1,0 +1,83 @@
+name: Inspect Pet Tomorrow live
+on:
+  push:
+    branches: [pet-tomorrow-pwa-fix]
+    paths: ['.github/workflows/inspect-pet-tomorrow-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Snapshot current Pet Tomorrow production
+        run: |
+          set -euo pipefail
+          mkdir -p snapshot
+          python3 - <<'PY'
+          import re, os, hashlib, urllib.parse, urllib.request
+          from html.parser import HTMLParser
+          BASE='https://pettomorrow.com/'
+          UA='Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36'
+          def fetch(url):
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=25) as r:
+                  return r.status,r.geturl(),r.headers.get('content-type',''),r.read()
+          status,final,ctype,body=fetch(BASE+'?pt_audit=20260916')
+          print('ROOT',status,final,ctype,len(body))
+          html=body.decode('utf-8','replace')
+          open('snapshot/index.html','w',encoding='utf-8').write(html)
+          title=re.search(r'<title[^>]*>(.*?)</title>',html,re.I|re.S)
+          print('TITLE', re.sub(r'\s+',' ',title.group(1)).strip() if title else 'NONE')
+          print('HAS_PET_TOMORROW', 'Pet Tomorrow' in html or 'PetTomorrow' in html)
+          jp=re.findall(r'[\u3040-\u30ff\u3400-\u9fff]+',html)
+          print('JAPANESE_TEXT', sorted(set(jp))[:30])
+          class P(HTMLParser):
+              def __init__(self): super().__init__(); self.urls=[]; self.tags=[]
+              def handle_starttag(self,tag,attrs):
+                  d=dict(attrs); self.tags.append((tag,d))
+                  for k in ('src','href'):
+                      if d.get(k): self.urls.append((tag,k,d[k],d))
+          p=P(); p.feed(html)
+          for tag,k,u,d in p.urls:
+              if tag in ('link','img','script'):
+                  text=' '.join(f'{a}={b}' for a,b in d.items() if a in ('rel','type','sizes','purpose','alt','class','id'))
+                  if ('icon' in text.lower() or 'manifest' in text.lower() or 'logo' in text.lower() or 'pet' in text.lower()):
+                      print('BRAND_REF',tag,k,u,text)
+          urls=[]
+          for tag,k,u,d in p.urls:
+              if u.startswith(('data:','javascript:','#','mailto:','tel:')): continue
+              absu=urllib.parse.urljoin(BASE,u)
+              if urllib.parse.urlparse(absu).netloc!='pettomorrow.com': continue
+              path=urllib.parse.urlparse(absu).path
+              if not path or path=='/': continue
+              urls.append((absu,path))
+          known=['/manifest.webmanifest','/manifest.json','/sw.js','/service-worker.js','/serviceWorker.js','/favicon.ico','/icon-192.png','/icon-512.png','/icon-512-maskable.png','/apple-touch-icon.png','/logo.png','/assets/logo.png','/assets/pet-tomorrow-logo.png','/pet-tomorrow-logo.png']
+          for path in known: urls.append((urllib.parse.urljoin(BASE,path),path))
+          seen=set()
+          for absu,path in urls:
+              if path in seen: continue
+              seen.add(path)
+              try:
+                  st,fin,ct,b=fetch(absu+'?pt_audit=20260916' if '?' not in absu else absu+'&pt_audit=20260916')
+                  if st!=200: continue
+                  rel=path.lstrip('/')
+                  if path.endswith('/') or not os.path.splitext(rel)[1]: continue
+                  out=os.path.join('snapshot',rel)
+                  os.makedirs(os.path.dirname(out),exist_ok=True)
+                  open(out,'wb').write(b)
+                  print('FETCHED',path,ct,len(b),hashlib.sha256(b).hexdigest())
+              except Exception as e:
+                  print('MISS',path,type(e).__name__,str(e)[:120])
+          print('SNAPSHOT_FILES')
+          for root,dirs,files in os.walk('snapshot'):
+              for f in sorted(files):
+                  q=os.path.join(root,f); print(q,os.path.getsize(q))
+          PY
+      - name: Upload production snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: pettomorrow-live-snapshot
+          path: snapshot
+          retention-days: 1
