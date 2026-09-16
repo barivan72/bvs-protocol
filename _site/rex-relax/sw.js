@@ -1,5 +1,0 @@
-const CACHE='rex-relax-pages-2026-09-16-8';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./rex-relax-logo.png','./icon-192.png','./icon-512.png','./icon-512-maskable.png','./apple-touch-icon.png','./audio-v5-data.js','./audio-v5.js','./audio-v5-core.js'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();for(const k of await caches.keys())if(k.startsWith('rex-relax-pages-')&&k!==CACHE)await caches.delete(k);})()));
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.includes('/rex-relax/'))return;e.respondWith(fetch(e.request,{cache:'no-cache'}).then(r=>{if(r.ok)caches.open(CACHE).then(c=>c.put(e.request,r.clone()));return r;}).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('./index.html'):null)||new Response('Unavailable offline',{status:503})));});
