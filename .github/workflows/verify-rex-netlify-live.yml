@@ -1,0 +1,60 @@
+name: Verify Rex Relax Netlify live
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-rex-netlify-live.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Triple-check public standalone PWA
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, struct, time, urllib.request
+          base='https://rex-relax.netlify.app/'
+          def get(path,binary=False):
+              url=base+path+('?' if '?' not in path else '&')+'verify='+str(time.time())
+              req=urllib.request.Request(url,headers={'Cache-Control':'no-cache','User-Agent':'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36'})
+              with urllib.request.urlopen(req,timeout=20) as r:
+                  body=r.read()
+                  if r.status!=200: raise AssertionError((path,r.status))
+                  return r.geturl(),r.headers.get('Content-Type',''),body if binary else body.decode()
+          def png_size(b):
+              assert b[:8]==b'\x89PNG\r\n\x1a\n'
+              return struct.unpack('>II',b[16:24])
+          for pass_no in (1,2,3):
+              final,ctype,html=get('index.html')
+              _,mtype,mtext=get('manifest.webmanifest')
+              manifest=json.loads(mtext)
+              _,swtype,sw=get('sw.js')
+              _,_,i192=get('icon-192.png',True)
+              _,_,i512=get('icon-512.png',True)
+              _,_,imask=get('icon-512-maskable.png',True)
+              _,_,data=get('audio-v5-data.js')
+              assert 'Rex Relax' in html
+              assert manifest['name']=='Rex Relax'
+              assert manifest['display']=='standalone'
+              assert manifest['id']=='/'
+              assert manifest['scope']=='./'
+              assert manifest['start_url'].startswith('./?source=pwa')
+              assert any(i['sizes']=='192x192' and i['type']=='image/png' for i in manifest['icons'])
+              assert any(i['sizes']=='512x512' and i['type']=='image/png' and i.get('purpose')=='any' for i in manifest['icons'])
+              assert any(i['sizes']=='512x512' and i.get('purpose')=='maskable' for i in manifest['icons'])
+              assert png_size(i192)==(192,192)
+              assert png_size(i512)==(512,512)
+              assert png_size(imask)==(512,512)
+              assert 'rex-relax-root-2026-09-16-8' in sw
+              assert data.count('"type": "music"')==20
+              assert data.count('"type": "guided"')==5
+              assert 'static.wixstatic.com' not in mtext
+              assert 'wixsite.com' not in mtext
+              assert 'barivan72.github.io' not in mtext
+              print('PASS',pass_no,'OK',final,ctype,mtype,swtype)
+              time.sleep(2)
+          PY
