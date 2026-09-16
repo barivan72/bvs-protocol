@@ -19,7 +19,7 @@ jobs:
           set -euo pipefail
           for PASS in 1 2 3; do
             rm -rf "/tmp/rex-chrome-$PASS"
-            google-chrome --headless=new --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir="/tmp/rex-chrome-$PASS" 'https://bvsprotocol.com/rex-relax/' >/tmp/rex-chrome.log 2>&1 &
+            google-chrome --headless=new --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir="/tmp/rex-chrome-$PASS" 'https://bvs-protocol.vercel.app/rex-relax/?source=install&release=20260916-8' >/tmp/rex-chrome.log 2>&1 &
             CHROME_PID=$!
             trap 'kill $CHROME_PID 2>/dev/null || true' EXIT
             for i in $(seq 1 30); do
@@ -31,7 +31,7 @@ jobs:
           (async()=>{
             const pass=process.env.PASS;
             const targets=await CDP.List({host:'127.0.0.1',port:9222});
-            const target=targets.find(t=>t.type==='page' && t.url.includes('bvsprotocol.com/rex-relax')) || targets.find(t=>t.type==='page');
+            const target=targets.find(t=>t.type==='page' && t.url.includes('bvs-protocol.vercel.app/rex-relax')) || targets.find(t=>t.type==='page');
             if(!target) throw new Error('No Chrome page target');
             const client=await CDP({target,host:'127.0.0.1',port:9222});
             const {Page,Runtime}=client;
