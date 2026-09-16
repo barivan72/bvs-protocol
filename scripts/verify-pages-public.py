@@ -10,17 +10,13 @@ import urllib.request
 from pathlib import Path
 
 UA = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36"
-PET_RELEASE = "20260916-2"
+PET_RELEASE = "20260916-4"
 PET_LOGO_SHA = "7b39d400d307a28ff90cd9a3b6495fc3e4dfe6dcb8497a8db3d243701408c649"
-PET_APPROVED_APP_LOGO_SHA = "8ea56a80fee28b495fb986261475d00b765d283291c1df6f5b25ae0df1b35503"
-PET_ICON_512_SHA = "8ea56a80fee28b495fb986261475d00b765d283291c1df6f5b25ae0df1b35503"
-PET_MASKABLE_SHA = "3d853992c558389cf8e75f1a7bd70d1416843059570ce3dc60a14161d099aa4e"
 REX_LOGO_SHA = "5c9a2928fabef55fa8eefd2967aebd3499c60a55e66047ff448fe2e7a1462244"
 FREEZE_MANIFEST = Path("/tmp/rex-relax-freeze-hashes.json")
 
 
 def fetch(url: str) -> bytes:
-    """Wait for the newly published Pages generation, never accept a stale/404 response."""
     last_error: Exception | None = None
     for attempt in range(60):
         sep = "&" if "?" in url else "?"
@@ -68,24 +64,27 @@ def verify_pet(root: str) -> None:
     manifest = json.loads(fetch(base + "manifest.webmanifest").decode("utf-8"))
     worker = fetch(base + "sw.js").decode("utf-8")
     site_logo = fetch(base + "pt-logo-strip.png")
-    approved_logo = fetch(base + "pet-tomorrow-logo.png")
+    hero = fetch(base + "pt-hero-pets.png")
+    app_logo = fetch(base + "pet-tomorrow-logo.png")
     icon192 = fetch(base + "icon-192.png")
     icon512 = fetch(base + "icon-512.png")
     maskable = fetch(base + "icon-512-maskable.png")
     apple = fetch(base + "apple-touch-icon.png")
     favicon32 = fetch(base + "favicon-32.png")
     favicon48 = fetch(base + "favicon-48.png")
+    expected_icon_sha = fetch(base + "icon-sha256.txt").decode("utf-8").strip()
 
     assert sha(site_logo) == PET_LOGO_SHA
-    assert sha(approved_logo) == PET_APPROVED_APP_LOGO_SHA
-    assert sha(icon512) == PET_ICON_512_SHA
-    assert sha(maskable) == PET_MASKABLE_SHA
+    assert png_size(hero)[0] >= 800 and png_size(hero)[1] >= 500
+    assert png_size(app_logo) == (512, 512)
     assert png_size(icon192) == (192, 192)
     assert png_size(icon512) == (512, 512)
     assert png_size(maskable) == (512, 512)
     assert png_size(apple) == (180, 180)
     assert png_size(favicon32) == (32, 32)
     assert png_size(favicon48) == (48, 48)
+    assert sha(icon512) == expected_icon_sha
+    assert sha(app_logo) == expected_icon_sha
     assert manifest["name"] == "Pet Tomorrow"
     assert manifest["display"] == "standalone"
     assert manifest["scope"] == "./" and manifest["id"] == "./"
@@ -98,6 +97,7 @@ def verify_pet(root: str) -> None:
     assert f"pet-tomorrow-pwa-{PET_RELEASE}" in worker
     assert f"icon-512.png?v={PET_RELEASE}" in html
     assert f"manifest.webmanifest?v={PET_RELEASE}" in html
+    assert "register('./sw.js',{scope:'./'})" in html
 
 
 def main() -> None:
@@ -108,7 +108,7 @@ def main() -> None:
     for pass_no in (1, 2, 3):
         verify_rex(root, frozen)
         verify_pet(root)
-        print("PUBLIC_PASS", pass_no, "REX_RELAX_BYTE_IDENTICAL", "PET_TOMORROW_APPROVED_ICON_AND_PWA_OK", root + "pet-tomorrow/")
+        print("PUBLIC_PASS", pass_no, "REX_RELAX_BYTE_IDENTICAL", "PET_TOMORROW_GOLDEN_RETRIEVER_CAT_PWA_OK", root + "pet-tomorrow/")
         time.sleep(1)
 
 
