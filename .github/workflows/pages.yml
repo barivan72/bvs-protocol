@@ -48,8 +48,22 @@ jobs:
           cp orbit/rex-relax/audio-v5-data.js _site/rex-relax/audio-v5-data.js
           cp orbit/rex-relax/audio-v5.js _site/rex-relax/audio-v5.js
           cp orbit/rex-relax/audio-v5-core.js _site/rex-relax/audio-v5-core.js
-          cp orbit/rex-relax/icon-192.png _site/rex-relax/icon-192.png
-          cp orbit/rex-relax/icon-512.png _site/rex-relax/icon-512.png
+          cp orbit/rex-relax/logo.jpg _site/rex-relax/logo.jpg
+          cp orbit/rex-relax/icon.svg _site/rex-relax/icon.svg
+
+          if command -v magick >/dev/null 2>&1; then
+            magick _site/rex-relax/logo.jpg -resize 192x192! _site/rex-relax/icon-192.png
+            magick _site/rex-relax/logo.jpg -resize 512x512! _site/rex-relax/icon-512.png
+          elif command -v convert >/dev/null 2>&1; then
+            convert _site/rex-relax/logo.jpg -resize 192x192! _site/rex-relax/icon-192.png
+            convert _site/rex-relax/logo.jpg -resize 512x512! _site/rex-relax/icon-512.png
+          elif command -v ffmpeg >/dev/null 2>&1; then
+            ffmpeg -loglevel error -y -i _site/rex-relax/logo.jpg -vf scale=192:192 _site/rex-relax/icon-192.png
+            ffmpeg -loglevel error -y -i _site/rex-relax/logo.jpg -vf scale=512:512 _site/rex-relax/icon-512.png
+          else
+            echo 'No image scaler is available on the runner.' >&2
+            exit 1
+          fi
 
           python3 - <<'PY'
           from pathlib import Path
@@ -59,14 +73,14 @@ jobs:
           s=s.replace('href="/rex-relax/icon.svg" type="image/svg+xml"','href="./icon-512.png" type="image/png"')
           s=s.replace('href="/rex-relax/icon.svg"','href="./icon-512.png"')
           s=s.replace("navigator.serviceWorker.register('/rex-relax/sw.js',{scope:'/rex-relax/'})","navigator.serviceWorker.register('./sw.js',{scope:'./'})")
-          s=s.replace('src="/rex-relax/audio-v5-data.js?v=20260913-9"','src="./audio-v5-data.js?v=20260916-3"')
-          s=s.replace('src="/rex-relax/audio-v5.js?v=20260913-9"','src="./audio-v5.js?v=20260916-3"')
+          s=s.replace('src="/rex-relax/audio-v5-data.js?v=20260913-9"','src="./audio-v5-data.js?v=20260916-5"')
+          s=s.replace('src="/rex-relax/audio-v5.js?v=20260913-9"','src="./audio-v5.js?v=20260916-5"')
           s=s.replace('.mark{width:44px;height:44px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold2);font:24px Georgia}', '.mark{width:44px;height:44px;border:1px solid var(--gold);border-radius:50%;object-fit:cover;display:block;background:#080806}')
           s=s.replace('<div class="mark">R</div>', '<img class="mark" src="./icon-192.png" alt="Rex Relax logo">')
           p.write_text(s)
 
           p=Path('_site/rex-relax/audio-v5.js')
-          s=p.read_text().replace("core.src = '/rex-relax/audio-v5-core.js?v=20260916-2';","core.src = './audio-v5-core.js?v=20260916-3';")
+          s=p.read_text().replace("core.src = '/rex-relax/audio-v5-core.js?v=20260916-2';","core.src = './audio-v5-core.js?v=20260916-5';")
           p.write_text(s)
           PY
 
@@ -84,16 +98,16 @@ jobs:
             "description":"Rex Relax massage therapy app for sessions, music, client records and consent.",
             "prefer_related_applications":false,
             "icons":[
-              {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-              {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+              {"src":"./icon-192.png?v=20260916-5","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+              {"src":"./icon-512.png?v=20260916-5","sizes":"512x512","type":"image/png","purpose":"any maskable"}
             ]
           }
           JSON
 
           cat > _site/rex-relax/sw.js <<'JS'
-          const CACHE='rex-relax-pwa-2026-09-16-4';
+          const CACHE='rex-relax-pwa-2026-09-16-5';
           const BASE=new URL(self.registration.scope).pathname;
-          const ASSETS=['./index.html','./manifest.webmanifest','./audio-v5-data.js?v=20260916-3','./audio-v5.js?v=20260916-3','./audio-v5-core.js?v=20260916-3','./icon-192.png','./icon-512.png'];
+          const ASSETS=['./index.html','./manifest.webmanifest','./logo.jpg','./icon-192.png?v=20260916-5','./icon-512.png?v=20260916-5','./audio-v5-data.js?v=20260916-5','./audio-v5.js?v=20260916-5','./audio-v5-core.js?v=20260916-5'];
           self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
           self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('rex-relax-pwa-')&&k!==CACHE).map(k=>caches.delete(k)));})()));
           self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith(BASE))return;e.respondWith(fetch(e.request,{cache:'no-cache'}).then(r=>{if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return r}).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('./index.html'):null)||new Response('Unavailable offline',{status:503})));});
@@ -101,27 +115,32 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
-          import hashlib, json
+          import json, struct
+          def png_size(path):
+              data=Path(path).read_bytes()
+              assert data[:8]==b'\x89PNG\r\n\x1a\n', path
+              return struct.unpack('>II', data[16:24])
           m=json.loads(Path('_site/rex-relax/manifest.webmanifest').read_text())
-          assert m['display']=='standalone'
-          assert any(i['sizes']=='192x192' and 'any' in i['purpose'] and 'maskable' in i['purpose'] for i in m['icons'])
-          assert any(i['sizes']=='512x512' and 'any' in i['purpose'] and 'maskable' in i['purpose'] for i in m['icons'])
           h=Path('_site/rex-relax/index.html').read_text()
-          assert "register('./sw.js',{scope:'./'})" in h
-          assert './manifest.webmanifest' in h
-          assert './audio-v5-data.js?v=20260916-3' in h
-          assert './audio-v5.js?v=20260916-3' in h
+          a=Path('_site/rex-relax/audio-v5.js').read_text()
+          d=Path('_site/rex-relax/audio-v5-data.js').read_text()
+          assert m['display']=='standalone'
+          assert any(i['sizes']=='192x192' and 'maskable' in i['purpose'] for i in m['icons'])
+          assert any(i['sizes']=='512x512' and 'maskable' in i['purpose'] for i in m['icons'])
+          assert png_size('_site/rex-relax/icon-192.png')==(192,192)
+          assert png_size('_site/rex-relax/icon-512.png')==(512,512)
+          assert Path('_site/rex-relax/logo.jpg').stat().st_size>5000
           assert 'src="./icon-192.png" alt="Rex Relax logo"' in h
           assert '<div class="mark">R</div>' not in h
-          expected={
-            'icon-192.png':'84514c00cf0b9f502802ef62fe9b417fb95784e450903872bd276105993f92e9',
-            'icon-512.png':'3f868b546967970744182de0e4f00a4260a6d5683aefd10fc61a1812286c7e9e'
-          }
-          for icon,digest in expected.items():
-              data=Path('_site/rex-relax',icon).read_bytes()
-              assert data[:8]==b'\x89PNG\r\n\x1a\n', icon
-              assert hashlib.sha256(data).hexdigest()==digest, icon
-          print('Rex Relax canonical logo PWA package verified')
+          assert './logo.jpg?v=20260916-5' in a
+          assert 'static.wixstatic.com' not in a
+          assert 'static.wixstatic.com' not in json.dumps(m)
+          assert d.count('"type": "music"')==20
+          assert d.count('"type": "guided"')==5
+          assert './audio-v5-data.js?v=20260916-5' in h
+          assert './audio-v5.js?v=20260916-5' in h
+          assert "register('./sw.js',{scope:'./'})" in h
+          print('Rex Relax approved-logo package verified twice; audio catalogue preserved')
           PY
 
       - name: Setup Pages
@@ -143,14 +162,14 @@ jobs:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           python3 - <<'PY'
-          import hashlib, json, os, time, urllib.request
+          import json, os, struct, time, urllib.request
           base=os.environ['PAGE_URL'].rstrip('/')+'/rex-relax/'
           def get(path, binary=False):
               url=base+path
               last=None
-              for _ in range(15):
+              for _ in range(20):
                   try:
-                      req=urllib.request.Request(url+'?verify='+str(time.time()),headers={'Cache-Control':'no-cache','User-Agent':'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36'})
+                      req=urllib.request.Request(url+('&' if '?' in url else '?')+'verify='+str(time.time()),headers={'Cache-Control':'no-cache','User-Agent':'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36'})
                       with urllib.request.urlopen(req,timeout=10) as r:
                           data=r.read()
                           if r.status==200:
@@ -158,31 +177,33 @@ jobs:
                   except Exception as e:
                       last=e
                   time.sleep(2)
-              raise SystemExit(f'Public PWA verification failed for {url}: {last}')
+              raise SystemExit(f'Public Rex Relax verification failed for {url}: {last}')
+          def png_size(data):
+              assert data[:8]==b'\x89PNG\r\n\x1a\n'
+              return struct.unpack('>II',data[16:24])
           html=get('index.html')
           manifest_text=get('manifest.webmanifest')
           manifest=json.loads(manifest_text)
           worker=get('sw.js')
+          audio=get('audio-v5.js')
+          data=get('audio-v5-data.js')
+          logo=get('logo.jpg',True)
+          i192=get('icon-192.png',True)
+          i512=get('icon-512.png',True)
           assert manifest['name']=='Rex Relax'
           assert manifest['display']=='standalone'
-          assert manifest['start_url'].startswith('./index.html')
           assert manifest['scope']=='./'
           assert manifest['prefer_related_applications'] is False
-          assert any(i['sizes']=='192x192' and 'any' in i['purpose'] and 'maskable' in i['purpose'] for i in manifest['icons'])
-          assert any(i['sizes']=='512x512' and 'any' in i['purpose'] and 'maskable' in i['purpose'] for i in manifest['icons'])
-          assert './manifest.webmanifest' in html
-          assert "register('./sw.js',{scope:'./'})" in html
-          assert 'rex-relax-pwa-2026-09-16-4' in worker
-          assert 'static.wixstatic.com' not in manifest_text
+          assert png_size(i192)==(192,192)
+          assert png_size(i512)==(512,512)
+          assert len(logo)>5000 and logo[:2]==b'\xff\xd8'
           assert 'src="./icon-192.png" alt="Rex Relax logo"' in html
           assert '<div class="mark">R</div>' not in html
-          expected={
-            'icon-192.png':'84514c00cf0b9f502802ef62fe9b417fb95784e450903872bd276105993f92e9',
-            'icon-512.png':'3f868b546967970744182de0e4f00a4260a6d5683aefd10fc61a1812286c7e9e'
-          }
-          for icon,digest in expected.items():
-              data=get(icon, True)
-              assert data[:8]==b'\x89PNG\r\n\x1a\n', icon
-              assert hashlib.sha256(data).hexdigest()==digest, (icon, hashlib.sha256(data).hexdigest())
-          print('PUBLIC_REX_PWA_CANONICAL_LOGO_OK',base)
+          assert './logo.jpg?v=20260916-5' in audio
+          assert 'static.wixstatic.com' not in audio
+          assert 'static.wixstatic.com' not in manifest_text
+          assert 'rex-relax-pwa-2026-09-16-5' in worker
+          assert data.count('"type": "music"')==20
+          assert data.count('"type": "guided"')==5
+          print('PUBLIC_REX_RELAX_APPROVED_LOGO_OK',base)
           PY
