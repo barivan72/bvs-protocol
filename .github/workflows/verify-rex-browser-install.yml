@@ -1,0 +1,32 @@
+name: Verify Rex Relax browser installability
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-rex-browser-install.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Install browser test tool
+        run: |
+          npm install -g agent-browser
+          if command -v google-chrome >/dev/null; then
+            echo "AGENT_BROWSER_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            agent-browser install
+          fi
+      - name: Verify Rex Relax PWA in a clean mobile browser
+        run: |
+          set -euo pipefail
+          agent-browser open https://bvsprotocol.com/rex-relax/
+          agent-browser wait --load networkidle
+          agent-browser set viewport 390 844
+          agent-browser eval 'new Promise(async (resolve,reject)=>{try{for(let i=0;i<30;i++){const reg=await navigator.serviceWorker.getRegistration("/rex-relax/");const manifest=document.querySelector("link[rel=manifest]")?.href;const install=document.getElementById("rexPwaInstall");const state={title:document.title,url:location.href,manifest,serviceWorker:!!reg,installButton:!!install,installDisplay:install?getComputedStyle(install).display:null,icons:[...document.querySelectorAll("link[rel*=icon]")].map(x=>x.href)};if(reg&&manifest&&install&&getComputedStyle(install).display!=="none"){resolve(JSON.stringify(state));return;}await new Promise(r=>setTimeout(r,500));}throw new Error("PWA install prompt did not become available");}catch(e){reject(e)}})' > /tmp/rex-pwa.json
+          cat /tmp/rex-pwa.json
+          agent-browser errors
+          agent-browser close
