@@ -1,7 +1,27 @@
-const CACHE='rex-relax-2026-09-15-1';
-const ASSETS=['/rex-relax/index.html','/rex-relax/manifest.webmanifest','/rex-relax/icon.svg?v=20260915-1','/rex-relax/logo.jpg','/rex-relax/audio-v5-data.js?v=20260913-9','/rex-relax/audio-v5.js?v=20260913-9','/rex-relax/audio-v5-core.js?v=20260915-1'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('rex-relax-')&&k!==CACHE).map(k=>caches.delete(k)));for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.15.1'});})()));
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith('/rex-relax/')||u.pathname.startsWith('/rex-relax/music-60/'))return;
- e.respondWith(fetch(e.request,{cache:'no-cache'}).then(r=>{if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return r}).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('/rex-relax/index.html'):null)||new Response('Unavailable offline',{status:503})));
+const CACHE='rex-relax-2026-09-16-2';
+const ASSETS=[
+  '/rex-relax/index.html',
+  '/rex-relax/manifest.webmanifest',
+  '/rex-relax/audio-v5-data.js?v=20260913-9',
+  '/rex-relax/audio-v5.js?v=20260916-2',
+  '/rex-relax/audio-v5-core.js?v=20260916-2'
+];
+self.addEventListener('install',e=>e.waitUntil(
+  caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())
+));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{
+  await self.clients.claim();
+  const keys=await caches.keys();
+  await Promise.all(keys.filter(k=>k.startsWith('rex-relax-')&&k!==CACHE).map(k=>caches.delete(k)));
+  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.16.2'});
+})()));
+self.addEventListener('fetch',e=>{
+  const u=new URL(e.request.url);
+  if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith('/rex-relax/')||u.pathname.startsWith('/rex-relax/music-60/'))return;
+  e.respondWith(
+    fetch(e.request,{cache:'no-cache'}).then(r=>{
+      if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
+      return r;
+    }).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('/rex-relax/index.html'):null)||new Response('Unavailable offline',{status:503}))
+  );
 });
