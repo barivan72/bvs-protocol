@@ -63,17 +63,17 @@ jobs:
           p=Path('_site/rex-relax/index.html')
           s=p.read_text()
           s=s.replace('href="/rex-relax/manifest.webmanifest"','href="./manifest.webmanifest"')
-          s=s.replace('href="/rex-relax/icon.svg" type="image/svg+xml"','href="./icon-512.png" type="image/png"')
-          s=s.replace('href="/rex-relax/icon.svg"','href="./icon-512.png"')
+          s=s.replace('href="/rex-relax/icon.svg" type="image/svg+xml"','href="./icon-512.png?v=20260916-6" type="image/png"')
+          s=s.replace('href="/rex-relax/icon.svg"','href="./icon-512.png?v=20260916-6"')
           s=s.replace("navigator.serviceWorker.register('/rex-relax/sw.js',{scope:'/rex-relax/'})","navigator.serviceWorker.register('./sw.js',{scope:'./'})")
-          s=s.replace('src="/rex-relax/audio-v5-data.js?v=20260913-9"','src="./audio-v5-data.js?v=20260916-5"')
-          s=s.replace('src="/rex-relax/audio-v5.js?v=20260913-9"','src="./audio-v5.js?v=20260916-5"')
+          s=s.replace('src="/rex-relax/audio-v5-data.js?v=20260913-9"','src="./audio-v5-data.js?v=20260916-6"')
+          s=s.replace('src="/rex-relax/audio-v5.js?v=20260913-9"','src="./audio-v5.js?v=20260916-6"')
           s=s.replace('.mark{width:44px;height:44px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold2);font:24px Georgia}', '.mark{width:44px;height:44px;border:1px solid var(--gold);border-radius:50%;object-fit:cover;display:block;background:#080806}')
-          s=s.replace('<div class="mark">R</div>', '<img class="mark" src="./icon-192.png" alt="Rex Relax logo">')
+          s=s.replace('<div class="mark">R</div>', '<img class="mark" src="./icon-192.png?v=20260916-6" alt="Rex Relax logo">')
           p.write_text(s)
 
           p=Path('_site/rex-relax/audio-v5.js')
-          s=p.read_text().replace("core.src = '/rex-relax/audio-v5-core.js?v=20260916-2';","core.src = './audio-v5-core.js?v=20260916-5';")
+          s=p.read_text().replace("core.src = '/rex-relax/audio-v5-core.js?v=20260916-2';","core.src = './audio-v5-core.js?v=20260916-6';")
           p.write_text(s)
           PY
 
@@ -91,16 +91,16 @@ jobs:
             "description":"Rex Relax massage therapy app for sessions, music, client records and consent.",
             "prefer_related_applications":false,
             "icons":[
-              {"src":"./icon-192.png?v=20260916-5","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-              {"src":"./icon-512.png?v=20260916-5","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+              {"src":"./icon-192.png?v=20260916-6","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+              {"src":"./icon-512.png?v=20260916-6","sizes":"512x512","type":"image/png","purpose":"any maskable"}
             ]
           }
           JSON
 
           cat > _site/rex-relax/sw.js <<'JS'
-          const CACHE='rex-relax-pwa-2026-09-16-5';
+          const CACHE='rex-relax-pwa-2026-09-16-6';
           const BASE=new URL(self.registration.scope).pathname;
-          const ASSETS=['./index.html','./manifest.webmanifest','./logo.jpg','./icon-192.png?v=20260916-5','./icon-512.png?v=20260916-5','./audio-v5-data.js?v=20260916-5','./audio-v5.js?v=20260916-5','./audio-v5-core.js?v=20260916-5'];
+          const ASSETS=['./index.html','./manifest.webmanifest','./logo.jpg?v=20260916-6','./icon-192.png?v=20260916-6','./icon-512.png?v=20260916-6','./audio-v5-data.js?v=20260916-6','./audio-v5.js?v=20260916-6','./audio-v5-core.js?v=20260916-6'];
           self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
           self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('rex-relax-pwa-')&&k!==CACHE).map(k=>caches.delete(k)));})()));
           self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith(BASE))return;e.respondWith(fetch(e.request,{cache:'no-cache'}).then(r=>{if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return r}).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('./index.html'):null)||new Response('Unavailable offline',{status:503})));});
@@ -108,7 +108,8 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
-          import json, struct
+          import hashlib, json, struct
+          APPROVED='b83e84131d371bd366103e67b682fe7febf61f7fefaaaf92d167099ebc9da752'
           def png_size(path):
               data=Path(path).read_bytes()
               assert data[:8]==b'\x89PNG\r\n\x1a\n', path
@@ -117,23 +118,26 @@ jobs:
           h=Path('_site/rex-relax/index.html').read_text()
           a=Path('_site/rex-relax/audio-v5.js').read_text()
           d=Path('_site/rex-relax/audio-v5-data.js').read_text()
+          logo=Path('_site/rex-relax/logo.jpg').read_bytes()
+          assert hashlib.sha256(logo).hexdigest()==APPROVED
+          assert len(logo)==9882 and logo[:2]==b'\xff\xd8'
           assert m['display']=='standalone'
           assert any(i['sizes']=='192x192' and 'maskable' in i['purpose'] for i in m['icons'])
           assert any(i['sizes']=='512x512' and 'maskable' in i['purpose'] for i in m['icons'])
           assert png_size('_site/rex-relax/icon-192.png')==(192,192)
           assert png_size('_site/rex-relax/icon-512.png')==(512,512)
-          assert Path('_site/rex-relax/logo.jpg').stat().st_size>5000
-          assert 'src="./icon-192.png" alt="Rex Relax logo"' in h
+          assert 'src="./icon-192.png?v=20260916-6" alt="Rex Relax logo"' in h
           assert '<div class="mark">R</div>' not in h
-          assert './logo.jpg?v=20260916-5' in a
+          assert './logo.jpg?v=20260916-6' in a
           assert 'static.wixstatic.com' not in a
           assert 'static.wixstatic.com' not in json.dumps(m)
           assert d.count('"type": "music"')==20
           assert d.count('"type": "guided"')==5
-          assert './audio-v5-data.js?v=20260916-5' in h
-          assert './audio-v5.js?v=20260916-5' in h
+          assert './audio-v5-data.js?v=20260916-6' in h
+          assert './audio-v5.js?v=20260916-6' in h
           assert "register('./sw.js',{scope:'./'})" in h
-          print('Rex Relax approved-logo package verified twice; audio catalogue preserved')
+          print('REX_APPROVED_LOGO_BYTES_OK',APPROVED)
+          print('REX_AUDIO_CATALOGUE_OK music=20 guided=5')
           PY
 
       - name: Setup Pages
@@ -155,7 +159,8 @@ jobs:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           python3 - <<'PY'
-          import json, os, struct, time, urllib.request
+          import hashlib, json, os, struct, time, urllib.request
+          APPROVED='b83e84131d371bd366103e67b682fe7febf61f7fefaaaf92d167099ebc9da752'
           base=os.environ['PAGE_URL'].rstrip('/')+'/rex-relax/'
           def get(path, binary=False):
               url=base+path
@@ -183,20 +188,22 @@ jobs:
           logo=get('logo.jpg',True)
           i192=get('icon-192.png',True)
           i512=get('icon-512.png',True)
+          assert hashlib.sha256(logo).hexdigest()==APPROVED
+          assert len(logo)==9882 and logo[:2]==b'\xff\xd8'
           assert manifest['name']=='Rex Relax'
           assert manifest['display']=='standalone'
           assert manifest['scope']=='./'
           assert manifest['prefer_related_applications'] is False
           assert png_size(i192)==(192,192)
           assert png_size(i512)==(512,512)
-          assert len(logo)>5000 and logo[:2]==b'\xff\xd8'
-          assert 'src="./icon-192.png" alt="Rex Relax logo"' in html
+          assert 'src="./icon-192.png?v=20260916-6" alt="Rex Relax logo"' in html
           assert '<div class="mark">R</div>' not in html
-          assert './logo.jpg?v=20260916-5' in audio
+          assert './logo.jpg?v=20260916-6' in audio
           assert 'static.wixstatic.com' not in audio
           assert 'static.wixstatic.com' not in manifest_text
-          assert 'rex-relax-pwa-2026-09-16-5' in worker
+          assert 'rex-relax-pwa-2026-09-16-6' in worker
           assert data.count('"type": "music"')==20
           assert data.count('"type": "guided"')==5
-          print('PUBLIC_REX_RELAX_APPROVED_LOGO_OK',base)
+          print('PUBLIC_REX_EXACT_APPROVED_LOGO_OK',APPROVED,base)
+          print('PUBLIC_REX_AUDIO_CATALOGUE_OK music=20 guided=5')
           PY
