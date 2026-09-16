@@ -1,4 +1,4 @@
-name: Publish BVS redirect and Rex Relax PWA
+name: Publish frozen Rex Relax and Pet Tomorrow PWAs
 
 on:
   push:
@@ -25,109 +25,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install build dependencies
-        run: npm ci
+      - name: Install image dependency
+        run: python3 -m pip install --quiet pillow
 
-      - name: Build current Rex Relax release
-        run: npm run build
-
-      - name: Prepare GitHub Pages fallback PWA
-        run: |
-          set -euo pipefail
-          mkdir -p _site/rex-relax
-          touch _site/.nojekyll
-
-          cat > _site/index.html <<'HTML'
-          <!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><title>Rex Relax fallback host</title></head><body><p><a href="./rex-relax/">Open Rex Relax</a></p></body></html>
-          HTML
-          cp _site/index.html _site/404.html
-
-          cp orbit/rex-relax/index.html _site/rex-relax/index.html
-          cp orbit/rex-relax/audio-v5-data.js _site/rex-relax/audio-v5-data.js
-          cp orbit/rex-relax/audio-v5.js _site/rex-relax/audio-v5.js
-          cp orbit/rex-relax/audio-v5-core.js _site/rex-relax/audio-v5-core.js
-          cp orbit/rex-relax/rex-relax-logo.png _site/rex-relax/rex-relax-logo.png
-          cp orbit/rex-relax/icon-192.png _site/rex-relax/icon-192.png
-          cp orbit/rex-relax/icon-512.png _site/rex-relax/icon-512.png
-          cp orbit/rex-relax/icon-512-maskable.png _site/rex-relax/icon-512-maskable.png
-          cp orbit/rex-relax/apple-touch-icon.png _site/rex-relax/apple-touch-icon.png
-
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('_site/rex-relax/index.html')
-          s=p.read_text()
-          s=s.replace('/rex-relax/manifest.webmanifest?v=20260916-8','./manifest.webmanifest?v=20260916-8')
-          s=s.replace('/rex-relax/icon-192.png?v=20260916-8','./icon-192.png?v=20260916-8')
-          s=s.replace('/rex-relax/icon-512.png?v=20260916-8','./icon-512.png?v=20260916-8')
-          s=s.replace('/rex-relax/apple-touch-icon.png?v=20260916-8','./apple-touch-icon.png?v=20260916-8')
-          s=s.replace('/rex-relax/audio-v5-data.js?v=20260913-9','./audio-v5-data.js?v=20260913-9')
-          s=s.replace('/rex-relax/audio-v5.js?v=20260916-8','./audio-v5.js?v=20260916-8')
-          s=s.replace("navigator.serviceWorker.register('/rex-relax/sw.js',{scope:'/rex-relax/'})","navigator.serviceWorker.register('./sw.js',{scope:'./'})")
-          p.write_text(s)
-
-          p=Path('_site/rex-relax/audio-v5.js')
-          s=p.read_text()
-          s=s.replace("'/rex-relax/rex-relax-logo.png?v=20260916-8'","'./rex-relax-logo.png?v=20260916-8'")
-          s=s.replace("'/rex-relax/audio-v5-core.js?v=20260916-2'","'./audio-v5-core.js?v=20260916-2'")
-          p.write_text(s)
-          PY
-
-          cat > _site/rex-relax/manifest.webmanifest <<'JSON'
-          {
-            "name":"Rex Relax",
-            "short_name":"Rex Relax",
-            "id":"./",
-            "start_url":"./?source=pwa&release=20260916-8",
-            "scope":"./",
-            "display":"standalone",
-            "display_override":["standalone","minimal-ui"],
-            "background_color":"#080806",
-            "theme_color":"#080806",
-            "description":"Rex Relax massage therapy app for sessions, music, client records and consent.",
-            "prefer_related_applications":false,
-            "icons":[
-              {"src":"./icon-192.png?v=20260916-8","sizes":"192x192","type":"image/png","purpose":"any"},
-              {"src":"./icon-512.png?v=20260916-8","sizes":"512x512","type":"image/png","purpose":"any"},
-              {"src":"./icon-512-maskable.png?v=20260916-8","sizes":"512x512","type":"image/png","purpose":"maskable"}
-            ]
-          }
-          JSON
-
-          cat > _site/rex-relax/sw.js <<'JS'
-          const CACHE='rex-relax-pages-2026-09-16-8';
-          const ASSETS=['./','./index.html','./manifest.webmanifest','./rex-relax-logo.png','./icon-192.png','./icon-512.png','./icon-512-maskable.png','./apple-touch-icon.png','./audio-v5-data.js','./audio-v5.js','./audio-v5-core.js'];
-          self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
-          self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();for(const k of await caches.keys())if(k.startsWith('rex-relax-pages-')&&k!==CACHE)await caches.delete(k);})()));
-          self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.includes('/rex-relax/'))return;e.respondWith(fetch(e.request,{cache:'no-cache'}).then(r=>{if(r.ok)caches.open(CACHE).then(c=>c.put(e.request,r.clone()));return r;}).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('./index.html'):null)||new Response('Unavailable offline',{status:503})));});
-          JS
-
-          python3 - <<'PY'
-          from pathlib import Path
-          import hashlib, json, struct
-          APPROVED='5c9a2928fabef55fa8eefd2967aebd3499c60a55e66047ff448fe2e7a1462244'
-          def size(name):
-              b=Path('_site/rex-relax/'+name).read_bytes()
-              assert b[:8]==b'\x89PNG\r\n\x1a\n'
-              return struct.unpack('>II',b[16:24])
-          logo=Path('_site/rex-relax/rex-relax-logo.png').read_bytes()
-          assert hashlib.sha256(logo).hexdigest()==APPROVED
-          assert size('icon-192.png')==(192,192)
-          assert size('icon-512.png')==(512,512)
-          assert size('icon-512-maskable.png')==(512,512)
-          assert size('apple-touch-icon.png')==(180,180)
-          m=json.loads(Path('_site/rex-relax/manifest.webmanifest').read_text())
-          assert m['display']=='standalone' and m['scope']=='./' and m['id']=='./'
-          assert any(i.get('purpose')=='maskable' for i in m['icons'])
-          h=Path('_site/rex-relax/index.html').read_text()
-          a=Path('_site/rex-relax/audio-v5.js').read_text()
-          d=Path('_site/rex-relax/audio-v5-data.js').read_text()
-          assert './manifest.webmanifest?v=20260916-8' in h
-          assert "register('./sw.js',{scope:'./'})" in h
-          assert './rex-relax-logo.png?v=20260916-8' in a
-          assert d.count('"type": "music"')==20
-          assert d.count('"type": "guided"')==5
-          print('PAGES_PACKAGE_OK')
-          PY
+      - name: Preserve sealed Rex Relax and build Pet Tomorrow PWA
+        run: python3 scripts/prepare-pages-release.py
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -143,30 +45,15 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Triple-check public fallback
+      - name: Triple-check public Rex freeze and Pet Tomorrow release
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import hashlib, json, os, struct, time, urllib.request
-          base=os.environ['PAGE_URL'].rstrip('/')+'/rex-relax/'
-          approved='5c9a2928fabef55fa8eefd2967aebd3499c60a55e66047ff448fe2e7a1462244'
-          def get(path,binary=False):
-              u=base+path+('?' if '?' not in path else '&')+'v='+str(time.time())
-              req=urllib.request.Request(u,headers={'Cache-Control':'no-cache','User-Agent':'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/142.0 Mobile Safari/537.36'})
-              with urllib.request.urlopen(req,timeout=20) as r:
-                  body=r.read(); assert r.status==200,(path,r.status); return body if binary else body.decode()
-          def size(b):
-              assert b[:8]==b'\x89PNG\r\n\x1a\n'; return struct.unpack('>II',b[16:24])
-          for n in (1,2,3):
-              html=get('index.html'); manifest=json.loads(get('manifest.webmanifest')); sw=get('sw.js')
-              logo=get('rex-relax-logo.png',True); i192=get('icon-192.png',True); i512=get('icon-512.png',True); mask=get('icon-512-maskable.png',True)
-              assert hashlib.sha256(logo).hexdigest()==approved
-              assert size(i192)==(192,192) and size(i512)==(512,512) and size(mask)==(512,512)
-              assert manifest['name']=='Rex Relax' and manifest['display']=='standalone' and manifest['scope']=='./'
-              assert 'rex-relax-pages-2026-09-16-8' in sw
-              assert 'Rex Relax' in html
-              print('PUBLIC_FALLBACK_OK',n,base)
-              time.sleep(1)
-          PY
+        run: python3 scripts/verify-pages-public.py "$PAGE_URL"
+
+      - name: Install Chrome PWA probe
+        run: npm install --no-save chrome-remote-interface
+
+      - name: Triple-check Pet Tomorrow installability in clean Chrome profiles
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: node scripts/verify-pet-installability.mjs "${PAGE_URL%/}/pet-tomorrow/?source=install&release=20260916-1"
