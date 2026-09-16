@@ -1,0 +1,39 @@
+name: Pet Tomorrow live diagnostic
+on:
+  push:
+    branches: ["pet-tomorrow-final"]
+    paths:
+      - '.github/workflows/pet-tomorrow-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect DNS and live PWA endpoints only
+        shell: bash
+        run: |
+          set -u
+          echo '=== DNS apex ==='
+          dig +short pettomorrow.com A || true
+          dig +short pettomorrow.com CNAME || true
+          echo '=== DNS www ==='
+          dig +short www.pettomorrow.com A || true
+          dig +short www.pettomorrow.com CNAME || true
+          echo '=== Pet Tomorrow root headers ==='
+          curl -fsSIL --max-time 20 https://pettomorrow.com/ || true
+          echo '=== Pet Tomorrow root markers ==='
+          curl -fsSL --max-time 20 https://pettomorrow.com/ | grep -Eio 'Pet Tomorrow|PetTomorrow|manifest[^" ]*|serviceWorker|pt-app-icon[^" ]*|data:image/svg\+xml' | head -40 || true
+          echo '=== Manifest candidates ==='
+          for u in https://pettomorrow.com/manifest.webmanifest https://pettomorrow.com/pet-tomorrow-v3.webmanifest; do
+            echo "--- $u"
+            curl -fsSL --max-time 20 "$u" | head -c 4000 || true
+            echo
+          done
+          echo '=== V3 icon candidate ==='
+          curl -sSIL --max-time 20 https://pettomorrow.com/icons/pt-app-icon-v3-512.png || true
+          echo '=== BVS Pet Tomorrow path ==='
+          curl -sSIL --max-time 20 https://bvsprotocol.com/pet-tomorrow/ || true
+          curl -fsSL --max-time 20 https://bvsprotocol.com/pet-tomorrow/ | grep -Eio 'Pet Tomorrow|PetTomorrow|manifest[^" ]*|serviceWorker|icon-512[^" ]*' | head -40 || true
