@@ -18,16 +18,26 @@ FREEZE_MANIFEST = Path("/tmp/rex-relax-freeze-hashes.json")
 
 
 def fetch(url: str) -> bytes:
-    sep = "&" if "?" in url else "?"
-    req = urllib.request.Request(
-        f"{url}{sep}verify={time.time()}",
-        headers={"User-Agent": UA, "Cache-Control": "no-cache"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as response:
-        body = response.read()
-        if response.status != 200:
-            raise RuntimeError(f"HTTP {response.status}: {url}")
-        return body
+    """Wait for the newly published Pages generation, never accept a stale/404 response."""
+    last_error: Exception | None = None
+    for attempt in range(60):
+        sep = "&" if "?" in url else "?"
+        req = urllib.request.Request(
+            f"{url}{sep}verify={time.time()}",
+            headers={"User-Agent": UA, "Cache-Control": "no-cache, no-store"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as response:
+                body = response.read()
+                if response.status == 200:
+                    return body
+                last_error = RuntimeError(f"HTTP {response.status}: {url}")
+        except Exception as exc:
+            last_error = exc
+        if attempt < 59:
+            print("WAITING_FOR_PAGES_PROPAGATION", attempt + 1, url, repr(last_error))
+            time.sleep(5)
+    raise RuntimeError(f"Pages did not become ready for {url}: {last_error!r}")
 
 
 def sha(data: bytes) -> str:
