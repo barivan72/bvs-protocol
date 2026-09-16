@@ -1,9 +1,11 @@
-const CACHE='rex-relax-2026-09-16-2';
+const CACHE='rex-relax-2026-09-16-5';
 const ASSETS=[
   '/rex-relax/index.html',
   '/rex-relax/manifest.webmanifest',
+  '/rex-relax/logo.jpg?v=20260916-5',
+  '/rex-relax/icon.svg?v=20260916-5',
   '/rex-relax/audio-v5-data.js?v=20260913-9',
-  '/rex-relax/audio-v5.js?v=20260916-2',
+  '/rex-relax/audio-v5.js?v=20260916-5',
   '/rex-relax/audio-v5-core.js?v=20260916-2'
 ];
 self.addEventListener('install',e=>e.waitUntil(
@@ -13,7 +15,7 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   await self.clients.claim();
   const keys=await caches.keys();
   await Promise.all(keys.filter(k=>k.startsWith('rex-relax-')&&k!==CACHE).map(k=>caches.delete(k)));
-  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.16.2'});
+  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.16.5'});
 })()));
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
