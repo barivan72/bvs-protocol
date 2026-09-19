@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b4f86">
+<title>BVS Protocol — Quick Guide for Care Homes</title>
+<meta name="description" content="A simple printable BVS Protocol quick guide for care homes, carers and clients.">
+<style>
+:root{--navy:#073b67;--blue:#0c76bd;--sky:#49aee7;--ink:#102f57;--line:#9fd5f6;--pale:#eff8fe;--green:#14844f;--red:#bb2025}
+*{box-sizing:border-box}
+html{background:#071321}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#173b59 0,#071321 55%);color:white}
+.toolbar{max-width:1220px;margin:0 auto;padding:18px 20px;display:flex;gap:10px;justify-content:flex-end;align-items:center}
+.toolbar a,.toolbar button{border:1px solid #315778;background:#10263a;color:#eaf6ff;border-radius:12px;padding:11px 16px;font:700 14px/1 system-ui;text-decoration:none;cursor:pointer}
+.toolbar button{background:linear-gradient(135deg,#eaf7ff,#a8d6f4);color:#082a47;border-color:#c9e9ff}
+.guide{width:min(1220px,calc(100% - 28px));margin:0 auto 28px;background:#fff;color:var(--ink);border:4px solid #177fc4;border-radius:34px;overflow:hidden;box-shadow:0 28px 80px #0008}
+.head{display:grid;grid-template-columns:250px 1fr 250px;align-items:center;gap:20px;padding:20px 26px 14px;border-bottom:1px solid #dceefa}
+.brand{text-align:center;border-right:1px solid #8bc7eb;padding-right:18px}.brand img{width:145px;max-width:100%;height:auto;filter:drop-shadow(0 6px 7px #0c4d7c35)}.brand b{display:block;font-size:22px;letter-spacing:.04em;margin-top:4px}
+.title{text-align:center}.title h1{margin:0;font-size:46px;letter-spacing:.01em;color:#0b4f86}.title .sub{font-size:23px;letter-spacing:.35em;color:#45a4df;margin-top:2px}.title .tag{font:600 24px/1.2 Georgia,serif;font-style:italic;color:#0d5f9e;margin-top:8px}
+.promise{background:linear-gradient(145deg,#edf6fd,#dcebf7);border-radius:22px;padding:18px;text-align:center;font-weight:800;font-size:18px;line-height:1.3;color:#0e3967}
+.grid{display:grid;grid-template-columns:255px repeat(3,1fr);margin:0 22px 16px;border:1px solid var(--line);border-radius:26px;overflow:hidden}
+.corner{background:#f9fcff}
+.stage{padding:14px 12px;text-align:center;color:#fff;background:linear-gradient(150deg,#4db2e7,#0c75b8);border-left:1px solid #bfe4fb}.stage:nth-child(3){background:linear-gradient(150deg,#258fc9,#0768ad)}.stage:nth-child(4){background:linear-gradient(150deg,#0b5b98,#083f70)}.stage strong{display:block;font-size:40px;line-height:1}.stage b{display:block;font-size:18px}.stage small{display:block;font-size:13px;font-weight:700;opacity:.9;letter-spacing:.05em}
+.time{padding:18px 16px;background:linear-gradient(145deg,#f1f8fd,#e2f1fa);border-top:1px solid #b9def5}.time .big{font-size:25px;font-weight:900;color:#0a3c6e}.time p{margin:6px 0 0;font-size:13px;line-height:1.4}.sun,.tea{font-size:38px;float:left;margin:0 10px 10px 0}
+.cell{padding:18px 22px;border-left:1px solid #b9def5;border-top:1px solid #b9def5;font-size:17px;line-height:1.55;background:#fff}.cell div{white-space:nowrap}.pill{display:inline-block;width:14px;height:14px;border-radius:50%;background:linear-gradient(145deg,#f6c344,#d68a00);margin-right:9px;box-shadow:inset 1px 1px 2px #fff7,0 1px 2px #0002}.pill.purple{background:linear-gradient(145deg,#cfc0ff,#8c75d5)}.pill.white{background:linear-gradient(145deg,#fff,#d8d8d8)}.pill.red{background:linear-gradient(145deg,#ff806f,#d83b2c)}.pill.gold{background:linear-gradient(145deg,#ffd65b,#d89800)}.pill.blue{background:linear-gradient(145deg,#d6edf9,#93c4df)}
+.bottom{display:grid;grid-template-columns:1.15fr 1fr 1fr .62fr;gap:10px;padding:0 22px 18px}.box{border-radius:20px;padding:14px 16px;font-size:13px;line-height:1.42}.box h3{margin:0 0 7px;font-size:18px}.iron{background:#fff0f1;color:#68181c}.do{background:#eaf8f0;color:#135a39}.dont{background:#fff0f1;color:#761c22}.support{background:linear-gradient(145deg,#eef8ff,#dcecf8);color:#1664a0;text-align:center;font-weight:800;display:flex;align-items:center;justify-content:center}.box ul{margin:0;padding-left:18px}.box li{margin:3px 0}
+.foot{font-size:12px;color:#35506c;padding:0 26px 18px;display:flex;justify-content:space-between;gap:20px}
+.foot strong{color:#0b5e9c}
+@media(max-width:900px){.guide{width:calc(100% - 14px);border-radius:22px}.head{grid-template-columns:120px 1fr}.promise{grid-column:1/-1}.brand img{width:95px}.brand b{font-size:13px}.title h1{font-size:30px}.title .sub{font-size:15px}.title .tag{font-size:17px}.grid{grid-template-columns:145px repeat(3,1fr);margin:0 8px 10px}.stage strong{font-size:27px}.stage b{font-size:12px}.stage small{font-size:10px}.time .big{font-size:18px}.time p{font-size:10px}.sun,.tea{font-size:25px}.cell{font-size:12px;padding:12px 9px}.cell div{white-space:normal}.bottom{grid-template-columns:1fr 1fr;padding:0 8px 12px}.support{min-height:90px}.foot{font-size:10px;padding:0 12px 12px;flex-direction:column;gap:4px}}
+@media(max-width:620px){.toolbar{padding:10px}.head{grid-template-columns:85px 1fr;padding:12px}.brand{padding-right:8px}.brand img{width:72px}.brand b{display:none}.title h1{font-size:23px}.title .sub{font-size:11px;letter-spacing:.22em}.title .tag{font-size:13px}.promise{font-size:13px;padding:10px}.grid{grid-template-columns:95px repeat(3,1fr)}.stage{padding:8px 5px}.stage strong{font-size:22px}.stage b{font-size:9px}.stage small{display:none}.time{padding:9px 6px}.time .big{font-size:14px}.time p{font-size:8.5px}.sun,.tea{display:none}.cell{font-size:9.5px;padding:9px 5px}.pill{width:8px;height:8px;margin-right:4px}.bottom{grid-template-columns:1fr}.box{font-size:11px}.foot{font-size:9px}}
+@page{size:A4 landscape;margin:6mm}
+@media print{
+  html,body{background:#fff!important}
+  .toolbar{display:none!important}
+  .guide{width:100%;margin:0;border-width:2px;border-radius:18px;box-shadow:none}
+  .head{padding:10px 16px 8px;grid-template-columns:190px 1fr 190px}
+  .brand img{width:100px}.brand b{font-size:16px}.title h1{font-size:34px}.title .sub{font-size:17px}.title .tag{font-size:18px}.promise{font-size:14px;padding:11px}
+  .grid{grid-template-columns:195px repeat(3,1fr);margin:0 12px 10px}.stage{padding:8px}.stage strong{font-size:28px}.stage b{font-size:13px}.stage small{font-size:10px}
+  .time{padding:11px 10px}.time .big{font-size:19px}.time p{font-size:10px}.sun,.tea{font-size:28px}.cell{padding:11px 14px;font-size:12.5px;line-height:1.45}
+  .bottom{gap:7px;padding:0 12px 9px}.box{padding:9px 10px;font-size:9.5px}.box h3{font-size:13px;margin-bottom:4px}.box li{margin:1px 0}.foot{padding:0 14px 6px;font-size:8.5px}
+}
+</style>
+</head>
+<body>
+<div class="toolbar" aria-label="Quick guide actions">
+  <a href="/live.html">← Back to BVS</a>
+  <button type="button" onclick="window.print()">Print / Save PDF</button>
+</div>
+<main class="guide" aria-label="BVS Protocol printable quick guide">
+  <header class="head">
+    <div class="brand"><img src="/assets/bvs-emblem.png" alt="BVS Protocol blue and silver atom"><b>BVS PROTOCOL</b></div>
+    <div class="title"><h1>BVS PROTOCOL</h1><div class="sub">QUICK GUIDE</div><div class="tag">Simple. Daily. Easy to follow.</div></div>
+    <div class="promise">Same Person.<br>Right Level.<br>Clear Routine.</div>
+  </header>
+
+  <section class="grid" aria-label="BVS stages and daily times">
+    <div class="corner"></div>
+    <div class="stage"><strong>B</strong><b>BIOAVAILABILITY</b><small>THE ESSENTIALS</small></div>
+    <div class="stage"><strong>V</strong><b>VITALITY</b><small>MORE SUPPORT</small></div>
+    <div class="stage"><strong>S</strong><b>SYNERGY</b><small>FULL ROUTINE</small></div>
+
+    <div class="time"><span class="sun">☀️</span><div class="big">MORNING</div><b>With breakfast</b><p>e.g. yoghurt, avocado, eggs or nuts — a little healthy fat.</p></div>
+    <div class="cell"><div><span class="pill"></span>Vitamin D3 + K2</div><div><span class="pill purple"></span>B-Complex</div><div><span class="pill white"></span>Vitamin C</div></div>
+    <div class="cell"><div><span class="pill"></span>Vitamin D3 + K2</div><div><span class="pill purple"></span>B-Complex</div><div><span class="pill white"></span>Vitamin C</div><div><span class="pill red"></span>CoQ10</div><div><span class="pill gold"></span>Omega-3</div></div>
+    <div class="cell"><div><span class="pill"></span>Vitamin D3 + K2</div><div><span class="pill purple"></span>B-Complex</div><div><span class="pill white"></span>Vitamin C</div><div><span class="pill red"></span>CoQ10</div><div><span class="pill gold"></span>Omega-3</div></div>
+
+    <div class="time"><span class="tea">☕</span><div class="big">5 PM</div><b>Tea time</b><p>Can be taken with food or water.</p></div>
+    <div class="cell"><div><span class="pill blue"></span>Magnesium Glycinate</div></div>
+    <div class="cell"><div><span class="pill blue"></span>Magnesium Glycinate</div></div>
+    <div class="cell"><div><span class="pill blue"></span>Magnesium Glycinate</div><div><span class="pill white"></span>Creatine <b>+ water</b></div></div>
+  </section>
+
+  <section class="bottom">
+    <div class="box iron"><h3>🩸 IF TAKING IRON</h3><ul><li>Empty stomach if tolerated.</li><li>Vitamin C can be taken with it.</li><li>Keep away from tea, coffee, dairy, eggs and magnesium — leave about 2 hours.</li></ul></div>
+    <div class="box do"><h3>DO ✓</h3><ul><li>Follow the correct level: B, V or S.</li><li>Give at the correct time.</li><li>Check the care plan, allergies and medicines.</li></ul></div>
+    <div class="box dont"><h3>DON'T ✕</h3><ul><li>Don't double a missed dose.</li><li>Don't crush or mix without advice.</li><li>Don't change prescribed medicines.</li></ul></div>
+    <div class="box support">BVS<br>QUICK<br>REFERENCE</div>
+  </section>
+
+  <footer class="foot">
+    <span><strong>Care-home safety:</strong> BVS complements the individual's care plan. Follow GP, pharmacist and prescribing-clinician advice.</span>
+    <span>bvsprotocol.com</span>
+  </footer>
+</main>
+</body>
+</html>
