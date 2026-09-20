@@ -2,26 +2,35 @@
   "name": "Rex Relax",
   "short_name": "Rex Relax",
   "id": "./",
-  "start_url": "./index.html?source=pwa&release=20260920-1",
+  "start_url": "./index.html?source=pwa&release=20260920-3",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#080806",
   "theme_color": "#080806",
   "description": "Rex Relax massage therapy app for sessions, music, client records and consent.",
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "./icon-192.png?v=20260916-7",
+      "src": "./icon-192.png?v=20260920-3",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon-512.png?v=20260916-7",
+      "src": "./icon-512.png?v=20260920-3",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png?v=20260920-3",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
