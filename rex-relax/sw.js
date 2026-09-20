@@ -1,4 +1,4 @@
-const CACHE='rex-relax-2026-09-20-1';
+const CACHE='rex-relax-2026-09-20-2';
 const ASSETS=[
   './',
   './index.html',
@@ -6,9 +6,9 @@ const ASSETS=[
   './logo.jpg?v=20260916-7',
   './icon-192.png?v=20260916-7',
   './icon-512.png?v=20260916-7',
-  './audio-v5-data.js?v=20260913-9',
-  './audio-v5.js?v=20260916-7',
-  './audio-v5-core.js?v=20260916-2'
+  './audio-v5-data.js?v=20260920-1',
+  './audio-v5.js?v=20260920-1',
+  './audio-v5-core.js?v=20260920-1'
 ];
 self.addEventListener('install',e=>e.waitUntil(
   caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())
@@ -17,11 +17,12 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   await self.clients.claim();
   const keys=await caches.keys();
   await Promise.all(keys.filter(k=>k.startsWith('rex-relax-')&&k!==CACHE).map(k=>caches.delete(k)));
-  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.16.7'});
+  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.20.2'});
 })()));
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
-  if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith('./')||u.pathname.startsWith('./music-60/'))return;
+  const scopePath=new URL(self.registration.scope).pathname;
+  if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith(scopePath))return;
   e.respondWith(
     fetch(e.request,{cache:'no-cache'}).then(r=>{
       if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
