@@ -1,9 +1,9 @@
 {
   "name": "Rex Relax",
   "short_name": "Rex Relax",
-  "id": "/rex-relax/",
-  "start_url": "/rex-relax/index.html?source=pwa&release=20260916-7",
-  "scope": "/rex-relax/",
+  "id": "./",
+  "start_url": "./index.html?source=pwa&release=20260920-1",
+  "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "background_color": "#080806",
@@ -12,13 +12,13 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/rex-relax/icon-192.png?v=20260916-7",
+      "src": "./icon-192.png?v=20260916-7",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/rex-relax/icon-512.png?v=20260916-7",
+      "src": "./icon-512.png?v=20260916-7",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
