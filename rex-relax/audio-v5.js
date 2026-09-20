@@ -1,7 +1,7 @@
 /* Rex Relax: final branding + standalone PWA install + recorded audio loader. */
 (() => {
   'use strict';
-  const icon = '/rex-relax/icon-512.png?v=20260916-7';
+  const icon = './icon-512.png?v=20260920-1';
 
   function applyBrand() {
     const mark = document.querySelector('.mark');
@@ -60,7 +60,7 @@
   else installUI();
 
   const core = document.createElement('script');
-  core.src = '/rex-relax/audio-v5-core.js?v=20260916-2';
+  core.src = './audio-v5-core.js?v=20260920-1';
   core.onload = applyBrand;
   core.onerror = () => console.error('Rex Relax audio player failed to load.');
   document.head.appendChild(core);
