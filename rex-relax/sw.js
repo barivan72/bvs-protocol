@@ -1,9 +1,9 @@
-const CACHE='rex-relax-2026-09-20-3';
+const CACHE='rex-relax-2026-09-20-4';
 const ASSETS=[
   './',
   './index.html',
   './manifest.webmanifest',
-  './logo.jpg?v=20260916-7',
+  './logo.jpg?v=20260920-4',
   './icon-192.png?v=20260920-3',
   './icon-512.png?v=20260920-3',
   './audio-v5-data.js?v=20260920-1',
@@ -17,7 +17,7 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   await self.clients.claim();
   const keys=await caches.keys();
   await Promise.all(keys.filter(k=>k.startsWith('rex-relax-')&&k!==CACHE).map(k=>caches.delete(k)));
-  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.20.3'});
+  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.20.4'});
 })()));
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
