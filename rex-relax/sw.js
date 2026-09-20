@@ -1,14 +1,14 @@
-const CACHE='rex-relax-2026-09-16-7';
+const CACHE='rex-relax-2026-09-20-1';
 const ASSETS=[
-  '/rex-relax/',
-  '/rex-relax/index.html',
-  '/rex-relax/manifest.webmanifest',
-  '/rex-relax/logo.jpg?v=20260916-7',
-  '/rex-relax/icon-192.png?v=20260916-7',
-  '/rex-relax/icon-512.png?v=20260916-7',
-  '/rex-relax/audio-v5-data.js?v=20260913-9',
-  '/rex-relax/audio-v5.js?v=20260916-7',
-  '/rex-relax/audio-v5-core.js?v=20260916-2'
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './logo.jpg?v=20260916-7',
+  './icon-192.png?v=20260916-7',
+  './icon-512.png?v=20260916-7',
+  './audio-v5-data.js?v=20260913-9',
+  './audio-v5.js?v=20260916-7',
+  './audio-v5-core.js?v=20260916-2'
 ];
 self.addEventListener('install',e=>e.waitUntil(
   caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())
@@ -21,11 +21,11 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
 })()));
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
-  if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith('/rex-relax/')||u.pathname.startsWith('/rex-relax/music-60/'))return;
+  if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith('./')||u.pathname.startsWith('./music-60/'))return;
   e.respondWith(
     fetch(e.request,{cache:'no-cache'}).then(r=>{
       if(r.ok){const copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
       return r;
-    }).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('/rex-relax/index.html'):null)||new Response('Unavailable offline',{status:503}))
+    }).catch(async()=>await caches.match(e.request)||((e.request.mode==='navigate')?await caches.match('./index.html'):null)||new Response('Unavailable offline',{status:503}))
   );
 });
