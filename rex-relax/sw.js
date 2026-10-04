@@ -1,13 +1,14 @@
-const CACHE='rex-relax-2026-09-20-4';
+const CACHE='rex-relax-2026-10-04-1';
 const ASSETS=[
   './',
   './index.html',
   './manifest.webmanifest',
-  './logo.jpg?v=20260920-4',
-  './icon-192.png?v=20260920-3',
-  './icon-512.png?v=20260920-3',
+  './recover-icon-192.png?v=20261004-1',
+  './recover-icon-512.png?v=20261004-1',
+  './recover-icon-maskable-512.png?v=20261004-1',
+  './recover-apple-touch-icon.png?v=20261004-1',
   './audio-v5-data.js?v=20260920-1',
-  './audio-v5.js?v=20260920-1',
+  './audio-v5.js?v=20261004-1',
   './audio-v5-core.js?v=20260920-1'
 ];
 self.addEventListener('install',e=>e.waitUntil(
@@ -17,7 +18,7 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   await self.clients.claim();
   const keys=await caches.keys();
   await Promise.all(keys.filter(k=>k.startsWith('rex-relax-')&&k!==CACHE).map(k=>caches.delete(k)));
-  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.09.20.4'});
+  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.10.04.1'});
 })()));
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);

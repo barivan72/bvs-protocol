@@ -1,7 +1,7 @@
 /* Rex Relax: final branding + standalone PWA install + recorded audio loader. */
 (() => {
   'use strict';
-  const icon = './logo.jpg?v=20260920-4';
+  const icon = './recover-icon-512.png?v=20261004-1';
 
   function applyBrand() {
     const mark = document.querySelector('.mark');
@@ -17,7 +17,6 @@
       img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
       mark.appendChild(img);
     }
-    document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach(link => { link.href = icon; });
     return Boolean(mark);
   }
 
