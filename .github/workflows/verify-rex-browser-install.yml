@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/verify-rex-browser-install.yml'
+      - 'rex-relax/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,7 +18,7 @@ jobs:
       - name: Wait for this Rex release to publish
         run: |
           for attempt in $(seq 1 60); do
-            if curl -fsS 'https://barivan72.github.io/bvs-protocol/rex-relax/manifest.webmanifest?verify=20261004-1' | grep -q '20261004-1'; then exit 0; fi
+            if curl -fsS 'https://barivan72.github.io/bvs-protocol/rex-relax/install.html?verify=20261004-2' | grep -q 'Capture readiness immediately'; then exit 0; fi
             sleep 5
           done
           exit 1
@@ -26,7 +27,7 @@ jobs:
           set -euo pipefail
           for PASS in 1 2 3; do
             rm -rf "/tmp/rex-chrome-$PASS"
-            google-chrome --headless=new --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir="/tmp/rex-chrome-$PASS" 'https://barivan72.github.io/bvs-protocol/rex-relax/?source=install&release=20261004-1' >/tmp/rex-chrome.log 2>&1 &
+            google-chrome --headless=new --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir="/tmp/rex-chrome-$PASS" 'https://barivan72.github.io/bvs-protocol/rex-relax/install.html?release=20261004-2' >/tmp/rex-chrome.log 2>&1 &
             CHROME_PID=$!
             trap 'kill $CHROME_PID 2>/dev/null || true' EXIT
             for i in $(seq 1 30); do
@@ -49,7 +50,7 @@ jobs:
             const state=await Runtime.evaluate({expression:`(async()=>{
               const reg=await navigator.serviceWorker.ready;
               const m=document.querySelector('link[rel="manifest"]');
-              return {title:document.title,url:location.href,manifest:m&&m.href,serviceWorkerScope:reg&&reg.scope,icons:[...document.querySelectorAll('link[rel~="icon"],link[rel="apple-touch-icon"]')].map(x=>x.href)};
+              return {title:document.title,installStatus:document.getElementById('status')?.textContent,installButton:document.getElementById('install')?.textContent,url:location.href,manifest:m&&m.href,serviceWorkerScope:reg&&reg.scope,icons:[...document.querySelectorAll('link[rel~="icon"],link[rel="apple-touch-icon"]')].map(x=>x.href)};
             })()`,awaitPromise:true,returnByValue:true});
             const info={pass:Number(pass),installabilityErrors:installability.installabilityErrors,manifestUrl:manifestResult.url,state:state.result.value};
             console.log(JSON.stringify(info));

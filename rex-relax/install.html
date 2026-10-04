@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080806">
+  <meta name="robots" content="noindex,follow">
+  <title>Install Rex Relax Recover</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=20261004-1">
+  <link rel="icon" type="image/png" href="./recover-icon-512.png?v=20261004-1">
+  <link rel="apple-touch-icon" href="./recover-apple-touch-icon.png?v=20261004-1">
+  <script>
+    // Capture readiness immediately, including before the page finishes loading.
+    let rexInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      rexInstallPrompt = event;
+      window.dispatchEvent(new Event('rex-install-ready'));
+    });
+  </script>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#080806;color:#f7f1e3;font:16px/1.6 Arial,Helvetica,sans-serif;min-height:100svh;display:grid;place-items:center;padding:24px}main{width:100%;max-width:480px;text-align:center}.logo{width:170px;height:170px;object-fit:contain;border-radius:32px}h1{font:38px/1.1 Georgia,serif;margin:22px 0 8px}.gold{color:#f0d696}.lead{color:#c7c1b3}button,.button{display:block;width:100%;padding:16px 20px;border-radius:14px;font:800 15px Arial,sans-serif;text-decoration:none;border:1px solid #d9b86c;background:#d9b86c;color:#080806;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.secondary{background:transparent;color:#f0d696;margin-top:12px}a{color:#f0d696;text-underline-offset:4px}:focus-visible{outline:3px solid #f0d696;outline-offset:4px}.help{text-align:left;border:1px solid #302b1f;border-radius:16px;background:#11110e;padding:18px 22px;margin-top:24px;font-size:14px}.help p{margin:8px 0}.small{font-size:13px;color:#aaa494}[hidden]{display:none!important}#status{min-height:52px;margin:18px 0}
+  </style>
+</head>
+<body>
+  <main>
+    <img class="logo" src="./recover-icon-512.png?v=20261004-1" width="170" height="170" alt="Rex Relax Recover — gold muscular leg">
+    <h1>REX RELAX <span class="gold">Recover</span></h1>
+    <p class="lead">Your massage app, ready for your home screen.</p>
+    <p id="status" role="status" aria-live="polite">Checking app installation…</p>
+    <button id="install" type="button" disabled>Preparing installation…</button>
+    <a id="openChrome" class="button secondary" hidden>OPEN IN CHROME</a>
+    <div class="help" id="help">
+      <p><strong>For the Rex Relax icon without a browser badge:</strong></p>
+      <p>Tap <strong>INSTALL REX RELAX</strong> here and confirm <strong>Install</strong> in your browser. Wait for installation to finish.</p>
+      <p>If offered <strong>Create shortcut</strong>, cancel it. A shortcut keeps the browser badge.</p>
+      <p>An old shortcut will not change. Remove only that shortcut from your home screen after installing the app. Keep your browser data and saved clients.</p>
+    </div>
+    <p><a href="./index.html">Continue to Rex Relax</a></p>
+    <p class="small">Music, sessions and client records remain in the existing app.</p>
+  </main>
+  <script>
+    (() => {
+      const button = document.getElementById('install');
+      const status = document.getElementById('status');
+      const chrome = document.getElementById('openChrome');
+      const android = /Android/i.test(navigator.userAgent);
+      const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+      const alreadyInstalled = standalone;
+      let requested = false;
+      let waiting;
+
+      function ready() {
+        if (!rexInstallPrompt || requested || alreadyInstalled) return;
+        clearTimeout(waiting);
+        button.hidden = false;
+        button.disabled = false;
+        button.textContent = 'INSTALL REX RELAX';
+        status.textContent = 'Ready. Tap below, then confirm Install.';
+        chrome.hidden = true;
+      }
+
+      function explain() {
+        if (rexInstallPrompt || requested || alreadyInstalled) return ready();
+        button.hidden = true;
+        if (ios) {
+          status.textContent = 'In Safari, tap Share, then Add to Home Screen.';
+          document.getElementById('help').hidden = true;
+        } else {
+          status.textContent = 'If Rex Relax is already installed, open it from your apps. Otherwise, open this page in Chrome and choose Install app. If only Create shortcut is offered, cancel and try again later.';
+          if (android) chrome.hidden = false;
+        }
+      }
+
+      if (android) {
+        const destination = new URL('install.html', location.href);
+        chrome.href = 'intent://' + destination.host + destination.pathname + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(destination.href) + ';end';
+      }
+      if (alreadyInstalled) {
+        button.hidden = true;
+        document.getElementById('help').hidden = true;
+        status.textContent = 'Rex Relax is open as an installed app.';
+      } else {
+        waiting = setTimeout(explain, 10000);
+        window.addEventListener('rex-install-ready', ready);
+        ready();
+      }
+      button.addEventListener('click', async () => {
+        const prompt = rexInstallPrompt;
+        if (!prompt) return;
+        rexInstallPrompt = null;
+        button.disabled = true;
+        try {
+          await prompt.prompt();
+          const choice = await prompt.userChoice;
+          if (choice.outcome === 'accepted') {
+            requested = true;
+            button.hidden = true;
+            status.textContent = 'Installation requested. Wait for it to finish, then open Rex Relax from your apps.';
+          } else {
+            button.hidden = true;
+            status.textContent = 'Installation cancelled. Reload this page when you want to try again.';
+          }
+        } catch (_) {
+          explain();
+        }
+      });
+      window.addEventListener('appinstalled', () => {
+        requested = true;
+        clearTimeout(waiting);
+        button.hidden = true;
+        chrome.hidden = true;
+        status.textContent = 'Installation requested. Wait for it to finish, then open Rex Relax from your apps.';
+      });
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js', {scope:'./',updateViaCache:'none'}).then(reg => reg.update()).catch(() => {
+          if (!rexInstallPrompt && !requested) explain();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
