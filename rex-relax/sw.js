@@ -1,4 +1,4 @@
-const CACHE='rex-relax-2026-10-04-1';
+const CACHE='rex-relax-2026-10-07-1';
 const ASSETS=[
   './',
   './index.html',
@@ -18,7 +18,7 @@ self.addEventListener('activate',e=>e.waitUntil((async()=>{
   await self.clients.claim();
   const keys=await caches.keys();
   await Promise.all(keys.filter(k=>k.startsWith('rex-relax-')&&k!==CACHE).map(k=>caches.delete(k)));
-  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.10.04.1'});
+  for(const c of await self.clients.matchAll({type:'window'}))c.postMessage({type:'REX_UPDATE_READY',release:'2026.10.07.1'});
 })()));
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
